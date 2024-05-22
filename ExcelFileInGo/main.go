@@ -5,9 +5,9 @@ import (
 	"excel/structs"
 	"log"
 	"os"
-	"reflect"
+//	"reflect"
 	"strconv"
-
+	"fmt"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -51,6 +51,7 @@ func main() {
 		excelFile.SetCellValue("People", string(byte(65+col+4))+strconv.Itoa(row), person.Age)
 		row++
 	}
+	fmt.Println("Hi")
 	err = excelFile.SaveAs("People.xlsx")
 	if err != nil {
 		log.Fatal("40", err)
