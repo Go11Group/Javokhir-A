@@ -51,8 +51,10 @@ func main() {
 		excelFile.SetCellValue("People", string(byte(65+col+4))+strconv.Itoa(row), person.Age)
 		row++
 	}
+	fmt.Println("Change")
 	err = excelFile.SaveAs("People.xlsx")
 	if err != nil {
 		log.Fatal("40", err)
 	}
+	
 }
