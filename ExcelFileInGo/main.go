@@ -52,8 +52,8 @@ func main() {
 		row++
 	}
 
-	fmt.Println("Hi")
-
+	//fmt.Println("Hi")
+	
 	err = excelFile.SaveAs("People.xlsx")
 	if err != nil {
 		log.Fatal("40", err)
