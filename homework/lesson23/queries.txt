@@ -28,3 +28,8 @@ INSERT INTO CARS (BRAND, MODEL, CREATED_YEAR, PRICE) VALUES
 	('Hyundai', 'Elantra', 2016, 13000),
 	('Kia', 'Optima', 2020, 20000);
 
+
+// ORDER BY is used to sort records
+
+SELECT *FROM CARS 
+	ORDER BY ID DESC; //this query sellects all records and sorts in desending order
