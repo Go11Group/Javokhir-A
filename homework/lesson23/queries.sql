@@ -33,3 +33,10 @@ INSERT INTO CARS (BRAND, MODEL, CREATED_YEAR, PRICE) VALUES
 
 SELECT *FROM CARS 
 	ORDER BY ID DESC; //this query sellects all records and sorts in desending order
+
+
+SELECT u.id, u.first_name, u.last_name, u.age, 
+		c.Brand, c.model, c.price, c.created_year
+FROM Users u
+	JOIN Cars c ON c.user_id = u.id 
+	WHERE c.user_id = NULL;
