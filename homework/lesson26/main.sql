@@ -138,7 +138,25 @@ VALUES ('Alice Johnson'),
        ('Isabella Davis'),
        ('Jacob Wilson');
 
-
+INSERT INTO student_course(Student_id, course_id) VALUES
+('62e30520-26e3-405f-b8b2-386e3ff071c2', '2b4d27e9-4b49-421c-8eb2-ed98a1094ee0'),
+('62e30520-26e3-405f-b8b2-386e3ff071c2', '86dc19da-494e-4f9d-af41-21d8c02395c5'),
+('6496ce48-2260-48a2-9af9-56fbeb8d070c', 'fa2099e2-b67f-4eab-9f24-fccad64f5804'),
+('62e30520-26e3-405f-b8b2-386e3ff071c2', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
+('91700992-8d1d-4559-a791-d141d1619f29', '86edb53b-81ab-42ee-8bf7-d5c3b031d028'),
+('91700992-8d1d-4559-a791-d141d1619f29', '86dc19da-494e-4f9d-af41-21d8c02395c5'),
+('753f167f-4b3a-44f0-ac1c-6bdd8f15fc17', '86dc19da-494e-4f9d-af41-21d8c02395c5'),
+('753f167f-4b3a-44f0-ac1c-6bdd8f15fc17', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
+('753f167f-4b3a-44f0-ac1c-6bdd8f15fc17', '208734ae-f4fd-45b1-9799-94b831ba7ce9'),
+('753f167f-4b3a-44f0-ac1c-6bdd8f15fc17', '86edb53b-81ab-42ee-8bf7-d5c3b031d028'),
+('015677ca-80d7-444a-8c9a-db058b623d69', '6e1168b1-8724-44b1-9659-02a8bcecbaed'),
+('015677ca-80d7-444a-8c9a-db058b623d69', '0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51'),
+('015677ca-80d7-444a-8c9a-db058b623d69', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
+('8dd6afc7-04d3-4627-850c-af6b072e4623', '208734ae-f4fd-45b1-9799-94b831ba7ce9'),
+('7eb0d90d-d29e-4e7f-b236-4d5c1643187c', 'fa2099e2-b67f-4eab-9f24-fccad64f5804'),
+('7b321c32-79b3-42a7-916c-257e466b8737', '0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51'),
+('71e0fcbc-f94b-4423-b71e-dde6c314b9c9', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
+('38e4e8ed-f494-40d5-9484-57dc60cdcb54', '86dc19da-494e-4f9d-af41-21d8c02395c5');
 
 --               course_id               |                 course_name                  
 -- --------------------------------------+----------------------------------------------
