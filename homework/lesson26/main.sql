@@ -158,6 +158,39 @@ INSERT INTO student_course(Student_id, course_id) VALUES
 ('71e0fcbc-f94b-4423-b71e-dde6c314b9c9', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
 ('38e4e8ed-f494-40d5-9484-57dc60cdcb54', '86dc19da-494e-4f9d-af41-21d8c02395c5');
 
+    
+INSERT INTO grades (student_course_id, grade) VALUES
+('d28d5fe8-2f9b-430a-927e-f8c46ae5aaad', 80),
+('91fd44f1-d9aa-498d-b881-9ae39f3b2ca2', 85),
+('0e52f2be-754c-40f3-a551-3cf9ab41effa', 71),
+('9625f5fd-2289-4d20-99c7-cd3954e298b5', 98),
+('1b7e1770-124d-4eb0-ad62-4ac8189e555a', 65),
+('f521e597-18a4-489c-ab2c-dfa3e16855dc', 74),
+('5757f008-0705-4109-885c-296c3377c60f', 56),
+('7e4d5104-a61e-4ae4-9978-23f4a7bd9659', 98),
+('c0d22dbd-05a3-48ca-9383-15b94a207d98', 77),
+('4a1d7e6e-d798-4474-84b1-c66bdfcb012c', 73),
+('d8705651-23d1-4335-bac9-bb73a7ec3b26', 85),
+('3b3fb73c-509c-425c-a1fc-b3d19822df7e', 47),
+('2f74d48d-6d65-4d4c-9176-efbcc59bb386', 90),
+('a4734ffa-a13b-4fd4-b4b3-bd9a7f431caa', 78),
+('3181acbb-6b50-4f70-a41b-5c00dac6966b', 75),
+('dc4954ff-af05-4444-a75e-a75f23a6ecef', 48),
+('2e4d02da-181e-4f09-849d-03420639f52a', 69),
+('38e75358-adfd-4286-a305-92f8ac1a1840', 58);
+
+
+SELECT s.student_name, c.course_name, g.grade
+FROM students s
+LEFT JOIN student_course cs
+ON s.student_id = cs.student_id
+LEFT JOIN courses c 
+ON cs.course_id = c.course_id
+LEFT JOIN grades g
+ON g.student_course_id = cs.id
+ORDER BY g.grade DESC;
+
+
 --               course_id               |                 course_name                  
 -- --------------------------------------+----------------------------------------------
 --  86dc19da-494e-4f9d-af41-21d8c02395c5 | Introduction to Programming
@@ -170,7 +203,6 @@ INSERT INTO student_course(Student_id, course_id) VALUES
 --  5a11344a-e95d-4624-881e-66ca9394c2fa | Calculus I: Differentiation and Integration
 --  208734ae-f4fd-45b1-9799-94b831ba7ce9 | Physics for Scientists and Engineers
 --  2b4d27e9-4b49-421c-8eb2-ed98a1094ee0 | World History: From Antiquity to the Present
--- (10 rows)
 
 
 --               student_id              |    student_name    
@@ -185,6 +217,25 @@ INSERT INTO student_course(Student_id, course_id) VALUES
 --  71e0fcbc-f94b-4423-b71e-dde6c314b9c9 | Henry Moore
 --  7b321c32-79b3-42a7-916c-257e466b8737 | Isabella Davis
 --  38e4e8ed-f494-40d5-9484-57dc60cdcb54 | Jacob Wilson
--- (10 rows)
 
-    
+
+--                   id                  |              student_id              |              course_id               
+-- --------------------------------------+--------------------------------------+--------------------------------------
+--  d28d5fe8-2f9b-430a-927e-f8c46ae5aaad | 62e30520-26e3-405f-b8b2-386e3ff071c2 | 2b4d27e9-4b49-421c-8eb2-ed98a1094ee0
+--  91fd44f1-d9aa-498d-b881-9ae39f3b2ca2 | 62e30520-26e3-405f-b8b2-386e3ff071c2 | 86dc19da-494e-4f9d-af41-21d8c02395c5
+--  0e52f2be-754c-40f3-a551-3cf9ab41effa | 6496ce48-2260-48a2-9af9-56fbeb8d070c | fa2099e2-b67f-4eab-9f24-fccad64f5804
+--  9625f5fd-2289-4d20-99c7-cd3954e298b5 | 62e30520-26e3-405f-b8b2-386e3ff071c2 | 06d23597-add6-4ff5-950d-b64c1efb76b3
+--  1b7e1770-124d-4eb0-ad62-4ac8189e555a | 91700992-8d1d-4559-a791-d141d1619f29 | 86edb53b-81ab-42ee-8bf7-d5c3b031d028
+--  f521e597-18a4-489c-ab2c-dfa3e16855dc | 91700992-8d1d-4559-a791-d141d1619f29 | 86dc19da-494e-4f9d-af41-21d8c02395c5
+--  5757f008-0705-4109-885c-296c3377c60f | 753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | 86dc19da-494e-4f9d-af41-21d8c02395c5
+--  7e4d5104-a61e-4ae4-9978-23f4a7bd9659 | 753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | 06d23597-add6-4ff5-950d-b64c1efb76b3
+--  c0d22dbd-05a3-48ca-9383-15b94a207d98 | 753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | 208734ae-f4fd-45b1-9799-94b831ba7ce9
+--  4a1d7e6e-d798-4474-84b1-c66bdfcb012c | 753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | 86edb53b-81ab-42ee-8bf7-d5c3b031d028
+--  d8705651-23d1-4335-bac9-bb73a7ec3b26 | 015677ca-80d7-444a-8c9a-db058b623d69 | 6e1168b1-8724-44b1-9659-02a8bcecbaed
+--  3b3fb73c-509c-425c-a1fc-b3d19822df7e | 015677ca-80d7-444a-8c9a-db058b623d69 | 0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51
+--  2f74d48d-6d65-4d4c-9176-efbcc59bb386 | 015677ca-80d7-444a-8c9a-db058b623d69 | 06d23597-add6-4ff5-950d-b64c1efb76b3
+--  a4734ffa-a13b-4fd4-b4b3-bd9a7f431caa | 8dd6afc7-04d3-4627-850c-af6b072e4623 | 208734ae-f4fd-45b1-9799-94b831ba7ce9
+--  3181acbb-6b50-4f70-a41b-5c00dac6966b | 7eb0d90d-d29e-4e7f-b236-4d5c1643187c | fa2099e2-b67f-4eab-9f24-fccad64f5804
+--  dc4954ff-af05-4444-a75e-a75f23a6ecef | 7b321c32-79b3-42a7-916c-257e466b8737 | 0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51
+--  2e4d02da-181e-4f09-849d-03420639f52a | 71e0fcbc-f94b-4423-b71e-dde6c314b9c9 | 06d23597-add6-4ff5-950d-b64c1efb76b3
+--  38e75358-adfd-4286-a305-92f8ac1a1840 | 38e4e8ed-f494-40d5-9484-57dc60cdcb54 | 86dc19da-494e-4f9d-af41-21d8c02395c5
