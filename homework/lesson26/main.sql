@@ -125,7 +125,7 @@ VALUES ('Introduction to Programming'),
        ('Calculus I: Differentiation and Integration'),
        ('Physics for Scientists and Engineers'),
        ('World History: From Antiquity to the Present');
-
+3
 INSERT INTO students (student_name)
 VALUES ('Alice Johnson'),
        ('Bob Williams'),
@@ -191,6 +191,87 @@ ON g.student_course_id = cs.id
 ORDER BY g.grade DESC;
 
 
+
+-- TASK 4
+-- 4. eng yosh o'quvchi guruh bo'yicha chiqarilsin chiqarilsin;
+-- yani gar bir guruhdan eng yosh o'quvchi(bir nechta bo'lsa har birini)
+
+SELECT c.course_name, s.student_name, s.student_age
+FROM courses c
+JOIN student_course cs ON cs.course_id = c.course_id
+JOIN students s ON s.student_id = cs.student_id
+WHERE s.student_age = (
+    SELECT MIN(s2.student_age)
+    FROM students s2
+    JOIN student_course cs2 ON s2.student_id = cs2.student_id
+    WHERE cs2.course_id = c.course_id
+)
+ORDER BY c.course_name, s.student_name;
+
+-- RESULT
+
+-----------------------------------------------------------------------------------------
+--                  course_name                  |    student_name    | student_age     |
+-- ----------------------------------------------+--------------------+-------------    |
+--  Data Analysis and Visualization              | Emily Garcia       |          21     |
+--  Introduction to Programming                  | Jacob Wilson       |          18     |
+--  Machine Learning for Beginners               | Isabella Davis     |          19     |
+--  Physics for Scientists and Engineers         | David Miller       |          19     |
+--  Physics for Scientists and Engineers         | Frederick Anderson |          19     |
+--  Public Speaking and Communication            | Alice Johnson      |          19     |
+--  Public Speaking and Communication            | David Miller       |          19     |
+--  Software Engineering Principles              | Charlie Brown      |          19     |
+--  Software Engineering Principles              | David Miller       |          19     |
+--  Web Development Fundamentals                 | Grace Lee          |          19     |
+--  World History: From Antiquity to the Present | Alice Johnson      |          19     |
+-----------------------------------------------------------------------------------------
+
+
+
+-- TASK 5
+-- 5. eng yaxshi o'qiydigan guruh chiqarilsin
+-- ya'ni, har bir guruhning o'rtacha bahosining eng katta(yaxshi) bo'lgani
+
+SELECT c.course_name, ROUND(avg(g.grade)::NUMERIC, 2) average_grade
+FROM courses c
+LEFT JOIN student_course cs
+ON cs.course_id = c.course_id
+LEFT JOIN students s
+ON s.student_id = cs.student_id
+JOIN grades g
+ON g.student_course_id = cs.id
+GROUP BY c.course_name
+ORDER BY average_grade DESC;
+
+-- RESULT
+-------------------------------------------------------------------
+--                  course_name                  | average_grade   | 
+-- ----------------------------------------------+---------------  |
+--  Public Speaking and Communication            |         88.75   |
+--  Data Analysis and Visualization              |         85.00   |
+--  World History: From Antiquity to the Present |         80.00   |
+--  Physics for Scientists and Engineers         |         77.50   |
+--  Web Development Fundamentals                 |         73.00   |
+--  Software Engineering Principles              |         69.00   |
+--  Introduction to Programming                  |         68.25   |
+--  Machine Learning for Beginners               |         47.50   |
+-------------------------------------------------------------------
+
+
+
+
+-- altering students table to add age column
+ALTER TABLE students ADD COLUMN student_age INT DEFAULT 18;
+
+UPDATE students
+SET student_age = FLOOR(18 + (RANDOM() * 5))::INT;
+-----
+
+
+
+
+
+
 --               course_id               |                 course_name                  
 -- --------------------------------------+----------------------------------------------
 --  86dc19da-494e-4f9d-af41-21d8c02395c5 | Introduction to Programming
@@ -205,18 +286,19 @@ ORDER BY g.grade DESC;
 --  2b4d27e9-4b49-421c-8eb2-ed98a1094ee0 | World History: From Antiquity to the Present
 
 
---               student_id              |    student_name    
--- --------------------------------------+--------------------
---  62e30520-26e3-405f-b8b2-386e3ff071c2 | Alice Johnson
---  6496ce48-2260-48a2-9af9-56fbeb8d070c | Bob Williams
---  91700992-8d1d-4559-a791-d141d1619f29 | Charlie Brown
---  753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | David Miller
---  015677ca-80d7-444a-8c9a-db058b623d69 | Emily Garcia
---  8dd6afc7-04d3-4627-850c-af6b072e4623 | Frederick Anderson
---  7eb0d90d-d29e-4e7f-b236-4d5c1643187c | Grace Lee
---  71e0fcbc-f94b-4423-b71e-dde6c314b9c9 | Henry Moore
---  7b321c32-79b3-42a7-916c-257e466b8737 | Isabella Davis
---  38e4e8ed-f494-40d5-9484-57dc60cdcb54 | Jacob Wilson
+--               student_id              |    student_name    | student_age 
+-- --------------------------------------+--------------------+-------------
+--  62e30520-26e3-405f-b8b2-386e3ff071c2 | Alice Johnson      |          19
+--  6496ce48-2260-48a2-9af9-56fbeb8d070c | Bob Williams       |          22
+--  91700992-8d1d-4559-a791-d141d1619f29 | Charlie Brown      |          19
+--  753f167f-4b3a-44f0-ac1c-6bdd8f15fc17 | David Miller       |          19
+--  015677ca-80d7-444a-8c9a-db058b623d69 | Emily Garcia       |          21
+--  8dd6afc7-04d3-4627-850c-af6b072e4623 | Frederick Anderson |          19
+--  7eb0d90d-d29e-4e7f-b236-4d5c1643187c | Grace Lee          |          19
+--  71e0fcbc-f94b-4423-b71e-dde6c314b9c9 | Henry Moore        |          20
+--  7b321c32-79b3-42a7-916c-257e466b8737 | Isabella Davis     |          19
+--  38e4e8ed-f494-40d5-9484-57dc60cdcb54 | Jacob Wilson       |          18
+
 
 
 --                   id                  |              student_id              |              course_id               
@@ -239,3 +321,26 @@ ORDER BY g.grade DESC;
 --  dc4954ff-af05-4444-a75e-a75f23a6ecef | 7b321c32-79b3-42a7-916c-257e466b8737 | 0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51
 --  2e4d02da-181e-4f09-849d-03420639f52a | 71e0fcbc-f94b-4423-b71e-dde6c314b9c9 | 06d23597-add6-4ff5-950d-b64c1efb76b3
 --  38e75358-adfd-4286-a305-92f8ac1a1840 | 38e4e8ed-f494-40d5-9484-57dc60cdcb54 | 86dc19da-494e-4f9d-af41-21d8c02395c5
+
+
+--     student_name    |                 course_name                  | grade 
+-- --------------------+----------------------------------------------+-------
+--  Alice Johnson      | Public Speaking and Communication            |    98
+--  David Miller       | Public Speaking and Communication            |    98
+--  Emily Garcia       | Public Speaking and Communication            |    90
+--  Alice Johnson      | Introduction to Programming                  |    85
+--  Emily Garcia       | Data Analysis and Visualization              |    85
+--  Alice Johnson      | World History: From Antiquity to the Present |    80
+--  Frederick Anderson | Physics for Scientists and Engineers         |    78
+--  David Miller       | Physics for Scientists and Engineers         |    77
+--  Grace Lee          | Web Development Fundamentals                 |    75
+--  Charlie Brown      | Introduction to Programming                  |    74
+--  David Miller       | Software Engineering Principles              |    73
+--  Bob Williams       | Web Development Fundamentals                 |    71
+--  Henry Moore        | Public Speaking and Communication            |    69
+--  Charlie Brown      | Software Engineering Principles              |    65
+--  Jacob Wilson       | Introduction to Programming                  |    58
+--  David Miller       | Introduction to Programming                  |    56
+--  Isabella Davis     | Machine Learning for Beginners               |    48
+--  Emily Garcia       | Machine Learning for Beginners               |    47
+-- (18 rows)
