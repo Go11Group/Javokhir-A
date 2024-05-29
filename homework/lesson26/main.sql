@@ -156,7 +156,7 @@ INSERT INTO student_course(Student_id, course_id) VALUES
 ('7eb0d90d-d29e-4e7f-b236-4d5c1643187c', 'fa2099e2-b67f-4eab-9f24-fccad64f5804'),
 ('7b321c32-79b3-42a7-916c-257e466b8737', '0bac3f1d-1f7a-4d7d-b759-fda6c3e80b51'),
 ('71e0fcbc-f94b-4423-b71e-dde6c314b9c9', '06d23597-add6-4ff5-950d-b64c1efb76b3'),
-('38e4e8ed-f494-40d5-9484-57dc60cdcb54', '86dc19da-494e-4f9d-af41-21d8c02395c5');
+('38e4e8ed-f494-40d5-9484-57dc760cdcb54', '86dc19da-494e-4f9d-af41-21d8c02395c5');
 
     
 INSERT INTO grades (student_course_id, grade) VALUES
@@ -190,8 +190,84 @@ LEFT JOIN grades g
 ON g.student_course_id = cs.id
 ORDER BY g.grade DESC;
 
+-- TASK 2
+-- 2. guruhdagi eng yaxshi o'qiydigan studentlarni har guruh bo'yicha chiqaring. Agarda
+-- eng yaxshi baholar bir nechta kishida bo'lsa, hammasi chiqsin.
 
--- task 5
+
+
+
+-- TASK 3
+-- 3. guruhning o'rtacha bahosini har bir guruh bo'yicha chiqaring;
+
+SELECT c.course_name, ROUND(COALESCE(AVG(g.grade), 0)::NUMERIC, 2) AS average_grade
+FROM courses c
+LEFT JOIN student_course cs
+ON cs.course_id = c.course_id
+LEFT JOIN students s
+ON s.student_id = cs.student_id
+LEFT JOIN grades g
+ON g.student_course_id = cs.id
+GROUP BY c.course_name
+ORDER BY average_grade DESC;
+
+-- RESULT                  
+--------------------------------------------------------------------                   |
+--                  course_name                  | average_grade    |                  |
+-- ----------------------------------------------+---------------   |                  |
+--  Public Speaking and Communication            |         88.75    |                  |
+--  Data Analysis and Visualization              |         85.00    |                  |
+--  World History: From Antiquity to the Present |         80.00    |                  |
+--  Physics for Scientists and Engineers         |         77.50    |                  |
+--  Web Development Fundamentals                 |         73.00    |                  |
+--  Software Engineering Principles              |         69.00    |                  |
+--  Introduction to Programming                  |         68.25    |                  |
+--  Machine Learning for Beginners               |         47.50    |                  |
+--  Creative Writing Workshop                    |          0.00    |                  |
+--  Calculus I: Differentiation and Integration  |          0.00    |                  |
+--------------------------------------------------------------------                   |
+                    
+----------------------------------------------------------------------------------------
+
+-- TASK 4
+-- 4. eng yosh o'quvchi guruh bo'yicha chiqarilsin chiqarilsin;
+-- yani gar bir guruhdan eng yosh o'quvchi(bir nechta bo'lsa har birini)
+
+SELECT c.course_name, s.student_name, s.student_age
+FROM courses c
+JOIN student_course cs ON cs.course_id = c.course_id
+JOIN students s ON s.student_id = cs.student_id
+WHERE s.student_age = (
+    SELECT MIN(s2.student_age)
+    FROM students s2
+    JOIN student_course cs2 ON s2.student_id = cs2.student_id
+    WHERE cs2.course_id = c.course_id
+)
+ORDER BY c.course_name, s.student_name;
+
+-- RESULT
+
+-----------------------------------------------------------------------------------------
+--                  course_name                  |    student_name    | student_age     |
+-- ----------------------------------------------+--------------------+-------------    |
+--  Data Analysis and Visualization              | Emily Garcia       |          21     |
+--  Introduction to Programming                  | Jacob Wilson       |          18     |
+--  Machine Learning for Beginners               | Isabella Davis     |          19     |
+--  Physics for Scientists and Engineers         | David Miller       |          19     |
+--  Physics for Scientists and Engineers         | Frederick Anderson |          19     |
+--  Public Speaking and Communication            | Alice Johnson      |          19     |
+--  Public Speaking and Communication            | David Miller       |          19     |
+--  Software Engineering Principles              | Charlie Brown      |          19     |
+--  Software Engineering Principles              | David Miller       |          19     |
+--  Web Development Fundamentals                 | Grace Lee          |          19     |
+--  World History: From Antiquity to the Present | Alice Johnson      |          19     |
+-----------------------------------------------------------------------------------------
+
+
+
+-- TASK 5
+-- 5. eng yaxshi o'qiydigan guruh chiqarilsin
+-- ya'ni, har bir guruhning o'rtacha bahosining eng katta(yaxshi) bo'lgani
 
 SELECT c.course_name, ROUND(avg(g.grade)::NUMERIC, 2) average_grade
 FROM courses c
@@ -204,11 +280,32 @@ ON g.student_course_id = cs.id
 GROUP BY c.course_name
 ORDER BY average_grade DESC;
 
+-- RESULT
+-------------------------------------------------------------------
+--                  course_name                  | average_grade   | 
+-- ----------------------------------------------+---------------  |
+--  Public Speaking and Communication            |         88.75   |
+--  Data Analysis and Visualization              |         85.00   |
+--  World History: From Antiquity to the Present |         80.00   |
+--  Physics for Scientists and Engineers         |         77.50   |
+--  Web Development Fundamentals                 |         73.00   |
+--  Software Engineering Principles              |         69.00   |
+--  Introduction to Programming                  |         68.25   |
+--  Machine Learning for Beginners               |         47.50   |
+-------------------------------------------------------------------
 
+
+
+
+-- altering students table to add age column
 ALTER TABLE students ADD COLUMN student_age INT DEFAULT 18;
 
 UPDATE students
 SET student_age = FLOOR(18 + (RANDOM() * 5))::INT;
+-----
+
+
+DELETE TABLE
 
 
 
