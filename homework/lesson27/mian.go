@@ -31,4 +31,6 @@ func main() {
 		panic(err)
 	}
 
+	query := ``
+	db.Query()
 }
