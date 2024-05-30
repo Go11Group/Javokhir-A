@@ -21,7 +21,7 @@ const (
 
 func NewConnetion() (*sql.DB, error) {
 	driverName := "postgres"
-	dataSourceName := fmt.Sprintf("user=%s host=%s port=%d password=%s databse=%s",
+	dataSourceName := fmt.Sprintf("user=%s host=%s port=%d password=%s database=%s",
 		user, host, port, password, database)
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {

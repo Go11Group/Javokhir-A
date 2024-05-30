@@ -2,4 +2,8 @@ module librarySystem
 
 go 1.22.3
 
-require github.com/lib/pq v1.10.9
+require (
+	github.com/bxcodec/faker v2.0.1+incompatible
+	github.com/google/uuid v1.6.0
+	github.com/lib/pq v1.10.9
+)

@@ -16,7 +16,7 @@ func NewBookRepo(db *sql.DB) *BookRepository {
 
 func (b *BookRepository) GetAllBooks() ([]models.Book, error) {
 	query := `
-        SELECT BookId, Title, Author, Genre, PublishedYear FROM books
+        SELECT BookdId, Title, Author, Genre, PublishedYear FROM books
         ORDER BY Title
     `
 
@@ -48,16 +48,40 @@ func (b *BookRepository) Create(book models.Book) error {
 
 	query := `
 	INSERT INTO books (
+		bookid,
 		Title, 
 		Author,
 		Genre, 
 		PublishedYear) 
-	VALUES($1, $2, $3, $4)
+	VALUES($1, $2, $3, $4, $5)
 	`
 
-	_, err := b.Db.Exec(query, book.Title, book.Author, book.Genre, book.PublishedYear)
+	_, err := b.Db.Exec(query, book.Id, book.Title, book.Author, book.Genre, book.PublishedYear)
 	if err != nil {
 		return fmt.Errorf("failed to create book %w", err)
+	}
+
+	return nil
+}
+
+func (b *BookRepository) Update(updatedBook models.Book) error {
+
+	query := `
+		UPDATE book 
+	`
+
+}
+
+func (b *BookRepository) Delete(deletingBook models.Book) error {
+
+	query := `
+		DELETE FROM books WHERE bookid = $1
+	`
+
+	_, err := b.Db.Exec(query, deletingBook.Id)
+
+	if err != nil {
+		return fmt.Errorf("failed while deleting book %w", err)
 	}
 
 	return nil
