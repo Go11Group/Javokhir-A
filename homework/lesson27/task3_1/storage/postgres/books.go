@@ -16,7 +16,7 @@ func NewBookRepo(db *sql.DB) *BookRepository {
 
 func (b *BookRepository) GetAllBooks() ([]models.Book, error) {
 	query := `
-        SELECT BookdId, Title, Author, Genre, PublishedYear FROM books
+        SELECT BookId, Title, Author, Genre, PublishedYear FROM books
         ORDER BY Title
     `
 
@@ -67,9 +67,20 @@ func (b *BookRepository) Create(book models.Book) error {
 func (b *BookRepository) Update(updatedBook models.Book) error {
 
 	query := `
-		UPDATE book 
+		UPDATE books 
+		SET Title = $1, 
+		    Author = $2, 
+		    Genre = $3, 
+		    PublishedYear = $4 
+		WHERE id = $5
 	`
 
+	_, err := b.Db.Exec(query, updatedBook.Title, updatedBook.Author, updatedBook.Genre, updatedBook.PublishedYear, updatedBook.Id)
+	if err != nil {
+		return fmt.Errorf("failed to update book: %w", err)
+	}
+
+	return nil
 }
 
 func (b *BookRepository) Delete(deletingBook models.Book) error {
@@ -85,4 +96,27 @@ func (b *BookRepository) Delete(deletingBook models.Book) error {
 	}
 
 	return nil
+}
+
+func (b *BookRepository) GetById(bookId string) (*models.Book, error) {
+	// Prepare the SQL query using a parameterized query
+	query := `
+		SELECT bookid, title, author, genre, publishedyear 
+		FROM books 
+		WHERE bookid = $1
+	`
+
+	// Create an empty Book object to hold the result
+	book := models.Book{}
+
+	// Execute the query with the bookId as the parameter
+	row := b.Db.QueryRow(query, bookId)
+
+	// Scan the result into the Book object
+	err := row.Scan(&book.Id, &book.Title, &book.Author, &book.Genre, &book.PublishedYear)
+	if err != nil {
+		return nil, fmt.Errorf("failed while scanning book: %w", err)
+	}
+
+	return &book, nil
 }
