@@ -27,7 +27,6 @@ func main() {
 	// newBook.Author = "NewBook"
 	// newBook.Genre = "Fiction"
 	// newBook.PublishedYear = 2022
-
 	// err = bookRepo.Create(newBook)
 	// if err != nil {
 	// 	log.Println(err)

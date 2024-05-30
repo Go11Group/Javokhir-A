@@ -34,4 +34,4 @@ func (l *LoansRepository) Create(loan models.Loan) error {
 	return nil
 }
 
-func (l *LoansRepository) Update()
+func (l *LoansRepository) Update(loan models.Loan)
