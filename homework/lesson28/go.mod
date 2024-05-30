@@ -1,4 +1,4 @@
-module librarySystem
+module github.com/Go11Group/at_lesson/lesson28
 
 go 1.22.3
 
