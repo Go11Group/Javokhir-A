@@ -24,21 +24,20 @@ func main() {
 	user1 := models.User{
 		FirstName: "Javokhir",
 		LastName:  "Abdusamatov",
-		Email:     "abdusamatovjavohir@gmai.com",
+		Email:     "abdusamatovjavohir@gmail.com", // Corrected email
 		Password:  "1234",
 		Age:       22,
-		Filed:     "Programming",
-		Geneder:   "Male",
+		Field:     "Programming",
+		Gender:    "Male",
 		IsEmploee: true,
 	}
-	user1.ID = 2
-	err = userRepo.Create(user1)
-	if err != nil {
-		log.Println("user1", err)
-	}
-	err = userRepo.Delete(&user1)
+	user1.ID = 1
+	// Uncomment to create user first before deleting
+	// if err := userRepo.Create(user1); err != nil {
+	// 	log.Println(err)
+	// }
 
-	if err != nil {
+	if err := userRepo.DeleteUser(&user1); err != nil {
 		log.Println(err)
 	}
 }

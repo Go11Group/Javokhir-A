@@ -11,7 +11,7 @@ type User struct {
 	Email     string
 	Password  string
 	Age       int
-	Filed     string
-	Geneder   string
+	Field     string
+	Gender    string
 	IsEmploee bool
 }
