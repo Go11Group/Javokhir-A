@@ -41,7 +41,7 @@ func (u *NewUserRepository) Update(user models.User) error {
 	return nil
 }
 
-func (u *NewUserRepository) DeleteUser(user *models.User) error {
+func (u *NewUserRepository) Delete(user *models.User) error {
 	if err := u.Db.Where("id = ?", user.ID).Delete(&user).Error; err != nil {
 		return fmt.Errorf("failed while deleting user record %w", err)
 	}
@@ -54,4 +54,14 @@ func (u *NewUserRepository) GetUserById(userId int) (*models.User, error) {
 		return nil, fmt.Errorf("failed while fetching user %w", err)
 	}
 	return &user, nil
+}
+
+func (u *NewUserRepository) GetAllUsers() ([]models.User, error) {
+	users := []models.User{}
+
+	if err := u.Db.Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("failed while fetching all users %w", err)
+	}
+
+	return users, nil
 }

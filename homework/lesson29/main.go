@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Go11Group/Javokhir-A/at_lesson/GormPractice/models"
@@ -31,13 +32,19 @@ func main() {
 		Gender:    "Male",
 		IsEmploee: true,
 	}
-	user1.ID = 1
-	// Uncomment to create user first before deleting
-	// if err := userRepo.Create(user1); err != nil {
-	// 	log.Println(err)
-	// }
 
-	if err := userRepo.DeleteUser(&user1); err != nil {
+	// Uncomment to create user first before deleting
+	if err := userRepo.Create(user1); err != nil {
 		log.Println(err)
 	}
+
+	if users, err := userRepo.GetAllUsers(); err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println(users)
+	}
+
+	// if err := userRepo.Delete(&user1); err != nil {
+	// 	log.Println(err)
+	// }
 }
