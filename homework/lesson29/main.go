@@ -32,6 +32,7 @@ func main() {
 		Gender:    "Male",
 		IsEmploee: true,
 	}
+	fmt.Println(user1)
 
 	// Uncomment to create user first before deleting
 	if err := userRepo.Create(user1); err != nil {
