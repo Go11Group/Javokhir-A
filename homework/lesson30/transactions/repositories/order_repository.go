@@ -83,3 +83,57 @@ func (o *OrderRepository) GetOrderById(orderId int) (*models.Order, error) {
 
 	return &order, nil
 }
+
+func (o *OrderRepository) DeleteOrder(orderId int) error {
+	tx := o.Db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			return
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return fmt.Errorf("beginning deter order transaction failed: %v", err)
+	}
+
+	if err := tx.Model(&models.Order{}).Where("id = ?", orderId).Delete(&models.Order{}).Error; err != nil {
+		return fmt.Errorf("deleting orfer failed: %v", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("commiting delte order transaction failed: %v", err)
+	}
+
+	return nil
+}
+
+func (o *OrderRepository) UpdateOrder(order *models.Order) error {
+	tx := o.Db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			return
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return fmt.Errorf("beginning order update transaction failed: %v", err)
+	}
+
+	if err := tx.Model(&models.Order{}).Where("id = ?", order.ID).Updates(
+		map[string]interface{}{
+			"user_id":    order.UserId,
+			"product_id": order.ProductId,
+		}).Error; err != nil {
+		return fmt.Errorf("updating order failed: %v", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("commiting order update transaction failed: %v", err)
+	}
+
+	return nil
+}

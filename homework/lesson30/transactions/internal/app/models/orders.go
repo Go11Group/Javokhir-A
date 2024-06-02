@@ -5,7 +5,11 @@ import "gorm.io/gorm"
 type Order struct {
 	gorm.Model
 	UserId    int
-	User      User
+	User      User `gorm:"foreignKey:UserId"`
 	ProductId int
-	Product   Product
+	Product   Product `gorm:"foreignKey:ProductId"`
+}
+
+func (o Order) TableName() string {
+	return "orders"
 }

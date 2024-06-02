@@ -8,3 +8,7 @@ type Product struct {
 	Description string  `gorm:"text" json:"description"`
 	Price       float64 `gorm:"not null" json:"price"`
 }
+
+func (p Product) TableName() string {
+	return "prodcuts"
+}
