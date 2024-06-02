@@ -7,7 +7,6 @@ import (
 	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/db/postgres"
 	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/internal/app/models"
 	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/repositories"
-	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/test"
 )
 
 const (
@@ -25,27 +24,63 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer postgres.CloseDb()
 
 	db := postgres.DB
 	// err = db.AutoMigrate(&models.Product{})
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	// err = db.AutoMigrate(&models.User{})
-	// if err != nil {
+	// err = db.Autd
+
+	// users := []*models.User{}
+	// products := []*models.Product{}
+
+	// if users, err = test.ReadingUsersJson(); err != nil {
 	// 	log.Fatal(err)
 	// }
 
-	users := []*models.User{}
+	// fmt.Printf("%v", users[0])
 
-	if users, err = test.ReadingUsersJson(); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("%v", users[0])
-
-	userRepo := repositories.NewUserRepository(db)
+	// userRepo := repositories.NewUserRepository(db)
 	productRepo := repositories.NewProductRepository(db)
-	fmt.Println("connected", userRepo, productRepo)
 
+	// fmt.Println("connected", userRepo, productRepo)
+
+	// for _, user := range users {
+	// 	fmt.Printf("%v\n", user)
+	// }
+
+	// for _, user := range users {
+	// 	if err := userRepo.CreateUser(user); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+	// if products, err = test.ReadingProductJson(); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// for _, product := range products {
+	// 	if err := productRepo.CreateProduct(product); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+
+	// if err := userRepo.DeleterUser(5); err != nil {
+	// log.Fatal(err)
+	// }
+	// if err := productRepo.DeleteProduct(8); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	product := &models.Product{}
+	product.ID = 10
+	product.Price = 522.2
+	product.Description = "Testing update"
+
+	// if err := productRepo.UpdateProduct(product); err != nil {
+	// 	log.Fatal(err)
+	// }
+	fmt.Println(productRepo.GetProductByID(product.ID))
+	// fmt.Println(userRepo.GetUserByID(7))
 }
