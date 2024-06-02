@@ -43,7 +43,8 @@ func main() {
 	// fmt.Printf("%v", users[0])
 
 	// userRepo := repositories.NewUserRepository(db)
-	productRepo := repositories.NewProductRepository(db)
+	// productRepo := repositories.NewProductRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
 
 	// fmt.Println("connected", userRepo, productRepo)
 
@@ -81,6 +82,17 @@ func main() {
 	// if err := productRepo.UpdateProduct(product); err != nil {
 	// 	log.Fatal(err)
 	// }
-	fmt.Println(productRepo.GetProductByID(product.ID))
+	// if err := orderRepo.Create(4, 85); err != nil {
+	// 	log.Fatal(err)
+	// }
+	order, err := orderRepo.GetOrderById(1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(order.User)
+	fmt.Println(order.Product)
+
+	// fmt.Println(productRepo.GetProductByID(product.ID))
 	// fmt.Println(userRepo.GetUserByID(7))
 }
