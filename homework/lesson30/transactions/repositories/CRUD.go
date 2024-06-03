@@ -40,6 +40,29 @@ func (f *UniverseRepository) FetchAll(result interface{}) error {
 	return nil
 }
 
+func (u *UniverseRepository) Create(model interface{}) error {
+	tableName := ""
+
+	switch model.(type) {
+	case *models.User:
+		tableName = (&models.User{}).TableName()
+	case *models.Product:
+		tableName = (&models.Product{}).TableName()
+	case *models.Order:
+		tableName = (&models.Order{}).TableName()
+	}
+
+	if tableName == "" {
+		return fmt.Errorf("invalid model type")
+	}
+
+	if err := u.Db.Table(tableName).Create(model).Error; err != nil {
+		return fmt.Errorf("failed to create record to %s table: %v", tableName, err)
+	}
+
+	return nil
+}
+
 func (u *UniverseRepository) Update(model interface{}) error {
 	tableName := ""
 	updatedModel := make(map[string]interface{})
