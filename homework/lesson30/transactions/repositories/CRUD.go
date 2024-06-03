@@ -75,9 +75,7 @@ func (u *UniverseRepository) Update(model interface{}) error {
 			"email":     m.Email,
 			"password":  m.Password,
 		}
-		v, _ := model.(models.User)
-		id = v.ID
-
+		id = m.ID
 	case *models.Product:
 		tableName = (&models.Product{}).TableName()
 		updatedModel = map[string]interface{}{
@@ -85,16 +83,14 @@ func (u *UniverseRepository) Update(model interface{}) error {
 			"description": m.Description,
 			"price":       m.Price,
 		}
-		v, _ := model.(models.Product)
-		id = v.ID
+		id = m.ID
 	case *models.Order:
 		tableName = (&models.Order{}).TableName()
 		updatedModel = map[string]interface{}{
 			"user_id":    m.UserId,
 			"product_id": m.ProductId,
 		}
-		v, _ := model.(models.Order)
-		id = v.ID
+		id = m.ID
 	default:
 		return fmt.Errorf("invalid model type")
 	}

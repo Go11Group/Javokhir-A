@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/db/postgres"
-	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/internal/app/models"
 	"github.com/Go11Group/Javokhir-A/homework/lesson30/transactions/repositories"
 )
 
@@ -28,8 +27,31 @@ func main() {
 
 	db := postgres.DB
 	uniRepo := repositories.NewUniverseRepository(db)
+	userRepo := repositories.NewUserRepository(db)
 
-	uniRepo.
+	updateUser, err := userRepo.GetUserByID(1005)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	updateUser.UserName = "java"
+	if err := uniRepo.Update(updateUser); err != nil {
+		log.Fatal(err)
+	}
+
+	// newOrder := &models.Order{
+	// 	UserId:    75,
+	// 	ProductId: 65,
+	// }
+
+	// if err := uniRepo.Create(&newOrder); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// newOrder.ID = 3
+	// if err := uniRepo.Update(newOrder); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// var users []models.User
 	// if err := uniRepo.FetchAll(&users); err != nil {
