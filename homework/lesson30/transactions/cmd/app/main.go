@@ -27,14 +27,26 @@ func main() {
 	defer postgres.CloseDb()
 
 	db := postgres.DB
-	fetcher := repositories.NewFetcher(db)
+	uniRepo := repositories.NewUniverseRepository(db)
 
-	var users []models.User
-	if err := fetcher.FetchAll(&users); err != nil {
-		log.Fatal(err)
-	}
+	uniRepo.
 
-	for _, user := range users {
-		fmt.Println(user)
-	}
+	// var users []models.User
+	// if err := uniRepo.FetchAll(&users); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// for _, user := range users {
+	// 	fmt.Println(user)
+	// }
+
+	// var products []models.Product
+	// if err := uniRepo.FetchAll(&products); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// for _, product := range products {
+	// 	fmt.Println(product)
+	// }
+
 }
