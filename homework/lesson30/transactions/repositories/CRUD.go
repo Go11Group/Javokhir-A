@@ -65,12 +65,12 @@ func (u *UniverseRepository) Create(model interface{}) error {
 
 func (u *UniverseRepository) Update(model interface{}) error {
 	tableName := ""
-	updatedModel := make(map[string]interface{})
+	correspondingModel := make(map[string]interface{})
 	var id uint
 	switch m := model.(type) {
 	case *models.User:
 		tableName = (&models.User{}).TableName()
-		updatedModel = map[string]interface{}{
+		correspondingModel = map[string]interface{}{
 			"user_name": m.UserName,
 			"email":     m.Email,
 			"password":  m.Password,
@@ -78,7 +78,7 @@ func (u *UniverseRepository) Update(model interface{}) error {
 		id = m.ID
 	case *models.Product:
 		tableName = (&models.Product{}).TableName()
-		updatedModel = map[string]interface{}{
+		correspondingModel = map[string]interface{}{
 			"name":        m.Name,
 			"description": m.Description,
 			"price":       m.Price,
@@ -86,7 +86,7 @@ func (u *UniverseRepository) Update(model interface{}) error {
 		id = m.ID
 	case *models.Order:
 		tableName = (&models.Order{}).TableName()
-		updatedModel = map[string]interface{}{
+		correspondingModel = map[string]interface{}{
 			"user_id":    m.UserId,
 			"product_id": m.ProductId,
 		}
@@ -99,9 +99,11 @@ func (u *UniverseRepository) Update(model interface{}) error {
 		return fmt.Errorf("invalid model type")
 	}
 
-	if err := u.Db.Table(tableName).Where("id = ?", id).Updates(updatedModel).Error; err != nil {
+	if err := u.Db.Table(tableName).Where("id = ?", id).Updates(correspondingModel).Error; err != nil {
 		return fmt.Errorf("failed to update record in %s table: %v", tableName, err)
 	}
 
 	return nil
 }
+
+func (u *UniverseRepository) Delete(model interface{})

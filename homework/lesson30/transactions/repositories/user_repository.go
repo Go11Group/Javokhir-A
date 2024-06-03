@@ -20,7 +20,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 func (u *UserRepository) CreateUser(user *models.User) error {
 	return u.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(user).Error; err != nil {
-			return fmt.Errorf("creating user failed: %w", err)
+			return fmt.Errorf("creating user failed: %v", err)
 		}
 		return nil
 	})
