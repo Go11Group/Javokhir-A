@@ -106,4 +106,4 @@ func (u *UniverseRepository) Update(model interface{}) error {
 	return nil
 }
 
-func (u *UniverseRepository) Delete(model interface{})
+// func (u *UniverseRepository) Delete(model interface{})
