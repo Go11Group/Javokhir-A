@@ -15,8 +15,11 @@ CREATE TABLE users (
     active BOOLEAN DEFAULT TRUE,
     CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
-CREATE INDEX user_id_idx ON users (id);
+CREATE INDEX user_id_idx ON users (id, username, first_name, last_name);
 DROP INDEX user_id_idx;
+
+CREATE INDEX user_id_idx_hash ON USING HASH(id)
+
 TRUNCATE users;
 DROP TABLE users;
 EXPLAIN(ANALYZE)
