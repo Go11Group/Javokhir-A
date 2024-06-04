@@ -1,0 +1,4 @@
+Faker package dan foydalanib for siklda 1 millionta fake datani database ga joylandi va indexsiz xolatida select qilinganda, qidirish natijasi deyarli 100 ms ga chiqdi.
+B-Tree index users table ni id siga qo'shilganida, id bo'yicha qidirish deyarli 99% ga kamaydi 1 ms ga yetmadi.
+B-Tree index lashda username ni o'zi index ga olinganda qidirish vaqti ko'paydi chunki username lar unique emas va id unique bo'lgani uchun query faqat 1 ta row ni olib kelishi kerak.
+Index Hashing ham huddi shu natija.
