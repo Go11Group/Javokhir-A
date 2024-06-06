@@ -18,7 +18,7 @@ func handleConnection(conn net.Conn) {
 			fmt.Println("Reading from server failed:", err)
 			return
 		}
-		fmt.Println("\nMessage from server:", string(message[:n]))
+		fmt.Printf("\n%s:%s", conn.LocalAddr().String(), string(message[:n]))
 	}
 }
 

@@ -3,19 +3,15 @@ package main
 import (
 	"fmt"
 	"net"
-	"sync"
 )
 
 var (
 	connections = make(map[net.Conn]bool)
-	connMutex   sync.Mutex
 )
 
 func handleConnection(con net.Conn) {
 	defer func() {
-		connMutex.Lock()
 		delete(connections, con)
-		connMutex.Unlock()
 		con.Close()
 	}()
 
@@ -35,8 +31,6 @@ func handleConnection(con net.Conn) {
 }
 
 func broadcastMessage(sender net.Conn, message string) {
-	connMutex.Lock()
-	defer connMutex.Unlock()
 
 	for con := range connections {
 		if con != sender {
@@ -65,9 +59,7 @@ func main() {
 			continue
 		}
 
-		connMutex.Lock()
 		connections[con] = true
-		connMutex.Unlock()
 
 		fmt.Println("Connection from:", con.RemoteAddr().String())
 

@@ -1,4 +1,4 @@
-package postgress
+package postgres
 
 import (
 	"fmt"
@@ -8,15 +8,32 @@ import (
 )
 
 var (
-	dns = "host=localhost port=5432 user=postgres database=testing sslmode=disable password=1702"
+	DB *gorm.DB
 )
 
-func NewDBConnection() (*gorm.DB, error) {
+func ConnectDB(dsn string) error {
 
-	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("failed while connecting to database: %v", err)
+		return fmt.Errorf("failed while connecting %w", err)
 	}
 
-	return db, nil
+	DB = db
+	DB.DB()
+	return nil
+}
+
+func CloseDB() {
+	if DB != nil {
+		dbPostgers, err := DB.DB()
+		if err != nil {
+			fmt.Printf("Error getting uderlying database connection: %v\n", err)
+			return
+		}
+
+		if err := dbPostgers.Close(); err != nil {
+			fmt.Printf("Erorr closing database connection: %v\n", err)
+			return
+		}
+	}
 }

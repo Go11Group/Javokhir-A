@@ -1,9 +1,8 @@
-module github.com/Go11Group/Javokhir-A/homework/lesson33
+module github.com/Go11Group/Javokhir-A/at_lesson/GormPractice
 
 go 1.22.3
 
 require (
-	github.com/google/uuid v1.6.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10
 )
