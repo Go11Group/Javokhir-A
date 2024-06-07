@@ -25,3 +25,7 @@ func (r *userRepository) GetUserByID(id int) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *userRepository) DeleteUserById(id int) error{
+	if 
+}

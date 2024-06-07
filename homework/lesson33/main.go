@@ -49,13 +49,18 @@ func main() {
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	userId, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	userRepo.(userId)
 }
 
 func UserFuncHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", "application/json")
-	// w.Header().
+	// w.Header().Values()
 	userId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		log.Fatal(err)
