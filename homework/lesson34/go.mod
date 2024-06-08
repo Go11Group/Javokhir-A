@@ -3,6 +3,7 @@ module github.com/Go11Group/Javokhir-A/homework/lesson34
 go 1.22.3
 
 require (
+	github.com/gorilla/mux v1.8.1
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10
 )

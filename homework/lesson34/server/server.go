@@ -4,26 +4,25 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Go11Group/Javokhir-A/homework/lesson34/repositories"
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
 type Server struct {
-	db           *gorm.DB
-	Repositories *repositories.UniRepo
+	db *gorm.DB
 }
 
 func NewServer(db *gorm.DB) *Server {
 	return &Server{db: db}
 }
 
-func (s *Server) Start() {
-	router := http.NewServeMux()
-	s.Repositories = repositories.NewUniRepo(s.db)
+func (s *Server) Start(db *gorm.DB, addr string) {
+	router := mux.NewRouter()
+	// router := http.NewServeMux()
 
-	SetupRoutes(router, s.db)
+	SetupRoutes(router, db)
 
-	err := http.ListenAndServe(":8080", router)
+	err := http.ListenAndServe(addr, router)
 	if err != nil {
 		log.Fatal(err)
 	}

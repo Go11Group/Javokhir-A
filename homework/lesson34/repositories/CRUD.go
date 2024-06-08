@@ -8,26 +8,32 @@ import (
 )
 
 type UniRepo struct {
-	user    *UserRepository
-	product *ProductRepository
-	order   *OrderRepository
+	*UserRepository
+	*ProductRepository
+	*OrderRepository
+	*UniverseRepository
+}
+
+type Filter struct {
+	Offset int    `json:"offset"`
+	Limit  int    `json:"limit"`
+	Where  string `json:"where"`
+}
+
+type UniverseRepositor struct {
+	Db *gorm.DB
 }
 
 func NewUniRepo(db *gorm.DB) *UniRepo {
-	userRepo := &UserRepository{
-		Db: db,
-	}
-	productRepo := &ProductRepository{
-		Db: db,
-	}
-	orderRepo := &OrderRepository{
-		Db: db,
-	}
-
+	userRepo := NewUserRepository(db)
+	productRepo := NewProductRepository(db)
+	orderRepo := NewOrderRepository(db)
+	uniRepo := NewUniverseRepository(db)
 	u := UniRepo{
-		user:    userRepo,
-		product: productRepo,
-		order:   orderRepo,
+		userRepo,
+		productRepo,
+		orderRepo,
+		uniRepo,
 	}
 	return &u
 }
@@ -42,23 +48,27 @@ func NewUniverseRepository(db *gorm.DB) *UniverseRepository {
 	}
 }
 
-func (f *UniverseRepository) FetchAll(result interface{}) error {
-	tableName := ""
+func (f *UniverseRepository) FetchAll(result interface{}, filter Filter) error {
+	var tableName, columnName string
 
 	switch result.(type) {
 	case *[]models.User:
 		tableName = (&models.User{}).TableName()
+		columnName = "user_name"
 	case *[]models.Product:
 		tableName = (&models.Product{}).TableName()
+		columnName = "product_name"
 	case *[]models.Order:
 		tableName = (&models.Order{}).TableName()
-	}
-
-	if tableName == "" {
+		columnName = "order_name"
+	default:
 		return fmt.Errorf("invalid model type")
 	}
 
-	if err := f.Db.Table(tableName).Find(result).Error; err != nil {
+	query := fmt.Sprintf("%s LIKE ?", columnName)
+	fmt.Println(tableName)
+
+	if err := f.Db.Where(query, "%%"+filter.Where+"%%").Limit(filter.Limit).Offset(filter.Offset).Find(result).Error; err != nil {
 		return fmt.Errorf("failed to fetch all records: %v", err)
 	}
 

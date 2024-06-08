@@ -27,10 +27,10 @@ func main() {
 
 	db := postgres.DB
 	// uniRepo := repositories.NewUniverseRepository(db)
-	// userRepo := repositories.NewUserRepository(db)
+	// userRepo := repositories.NewUserRepository(db)r
 
 	ser := server.NewServer(db)
 
-	ser.Start()
+	ser.Start(db, ":8080")
 
 }
