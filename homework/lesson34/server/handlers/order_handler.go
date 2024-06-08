@@ -31,10 +31,3 @@ func (h *Handlers) GetOrderByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-func (h *Handlers) CreateOrder(w http.ResponseWriter, r *http.Request) {
-
-}
-func (h *Handlers) DeleteOrder(w http.ResponseWriter, r *http.Request) {
-
-}

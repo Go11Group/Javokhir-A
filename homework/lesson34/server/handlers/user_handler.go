@@ -104,7 +104,7 @@ func (h *Handlers) UpdateUserById(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) GetAllUsersByFilter(w http.ResponseWriter, r *http.Request) {
 	filter := repositories.Filter{}
-
+	w.Header().Set("content-type", "application/json")
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
 		http.Error(w, "Failed to decode filter: "+err.Error(), http.StatusBadRequest)
 		return
