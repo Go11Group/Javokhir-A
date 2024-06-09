@@ -1,58 +1,70 @@
 package main
 
 import (
-	"context"
-	"flag"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
+	"path/filepath"
 	"time"
 
 	"github.com/gorilla/mux"
 )
 
-func main() {
-	var wait time.Duration
-	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
-	flag.Parse()
+// spaHandler implements the http.Handler interface, so we can use it
+// to respond to HTTP requests. The path to the static directory and
+// path to the index file within that static directory are used to
+// serve the SPA in the given static directory.
+type spaHandler struct {
+	staticPath string
+	indexPath  string
+}
 
-	r := mux.NewRouter()
-	// Add your routes as needed
+// ServeHTTP inspects the URL path to locate a file within the static dir
+// on the SPA handler. If a file is found, it will be served. If not, the
+// file located at the index path on the SPA handler will be served. This
+// is suitable behavior for serving an SPA (single page application).
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Join internally call path.Clean to prevent directory traversal
+	path := filepath.Join(h.staticPath, r.URL.Path)
 
-	srv := &http.Server{
-		Addr: "0.0.0.0:8080",
-		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
-		Handler:      r, // Pass our instance of gorilla/mux in.
+	// check whether a file exists or is a directory at the given path
+	fi, err := os.Stat(path)
+	if os.IsNotExist(err) || fi.IsDir() {
+		// file does not exist or path is a directory, serve index.html
+		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		return
 	}
 
-	// Run our server in a goroutine so that it doesn't block.
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
+	if err != nil {
+		// if we got an error (that wasn't that the file doesn't exist) stating the
+		// file, return a 500 internal server error and stop
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	c := make(chan os.Signal, 1)
-	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
-	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
-	signal.Notify(c, os.Interrupt)
+	// otherwise, use http.FileServer to serve the static file
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+}
 
-	// Block until we receive our signal.
-	<-c
+func main() {
+	router := mux.NewRouter()
 
-	// Create a deadline to wait for.
-	ctx, cancel := context.WithTimeout(context.Background(), wait)
-	defer cancel()
-	// Doesn't block if no connections, but will otherwise wait
-	// until the timeout deadline.
-	srv.Shutdown(ctx)
-	// Optionally, you could run srv.Shutdown in a goroutine and block on
-	// <-ctx.Done() if your application should wait for other services
-	// to finalize based on context cancellation.
-	log.Println("shutting down")
-	os.Exit(0)
+	router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		// an example API handler
+		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+	})
+
+	spa := spaHandler{staticPath: "build", indexPath: "index.html"}
+	router.PathPrefix("/").Handler(spa)
+
+	srv := &http.Server{
+		Handler: router,
+		Addr:    "127.0.0.1:8000",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
