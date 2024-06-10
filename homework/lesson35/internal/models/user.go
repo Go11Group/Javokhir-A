@@ -12,5 +12,4 @@ type User struct {
 	Rank      float64   `json:"rank"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_ate"`
-	DeletedAt time.Time `json:"deleted_at"`
 }

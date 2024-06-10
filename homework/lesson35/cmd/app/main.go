@@ -11,4 +11,6 @@ func main() {
 	server := app.NewServer(db.DB)
 
 	server.Start(":8080")
+
+	db.CloseDb()
 }

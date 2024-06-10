@@ -34,12 +34,32 @@ func (u *UsersService) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
-func (u *UsersService) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
-}
-func (u *UsersService) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (u *UsersService) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	var filter repositories.UserFilter
 
+	w.Header().Set("content-type", "application/json")
+
+	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
+		log.Println("Failed while validating user filter:" + err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	users, err := u.userRepo.GetAllUsers(filter)
+	if err != nil {
+		log.Fatal("getting all users by filter failed: " + err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		log.Println("Failed while transfering date into respons: " + err.Error())
+		http.Error(w, err.Error(), http.StatusNoContent)
+		return
+	}
 }
+
 func (u *UsersService) GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
@@ -60,6 +80,36 @@ func (u *UsersService) GetUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (u *UsersService) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+func (u *UsersService) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
+	var updateFilter repositories.UpdateUser
+
+	if err := json.NewDecoder(r.Body).Decode(&updateFilter); err != nil {
+		http.Error(w, "decoding to update filter failed: "+err.Error(), http.StatusBadRequest)
+		log.Println(err.Error())
+		return
+	}
+
+	if err := u.userRepo.UpdateUser(id, updateFilter); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Println("Failed udatading user: " + err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User successfully updated"))
+}
+
+func (u *UsersService) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	if err := u.userRepo.DeleteUser(id); err != nil {
+		http.Error(w, err.Error(), http.StatusNotImplemented)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

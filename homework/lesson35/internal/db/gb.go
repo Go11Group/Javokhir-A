@@ -35,3 +35,9 @@ func NewDBConnection() {
 
 	fmt.Println("Connection is set.")
 }
+
+func CloseDb() {
+	if err := DB.Close(); err != nil {
+		log.Fatal(err)
+	}
+}

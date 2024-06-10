@@ -10,7 +10,10 @@ import (
 
 func SetupRoutes(router *mux.Router, db *sql.DB) {
 	userRepo := repositories.NewUserRepo(db)
+	problemRepo := repositories.NewProblemRepo(db)
+
+	problemService := services.NewProblemService(problemRepo)
 	userService := services.NewUserService(userRepo)
 
-	SetupHandlers(router, userService)
+	SetupHandlers(router, userService, problemService)
 }
