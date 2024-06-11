@@ -39,43 +39,41 @@ type UserFilter struct {
 
 func (u UserRepository) GetAllUsers(filter UserFilter) ([]models.User, error) {
 	var users []models.User
-	var conditions []string
+	var params []string
 	var args []interface{}
 
 	query := `
 		SELECT id, name, user_name, rank, created_at, updated_at
-		FROM users
+		FROM users WHERE deleted_at IS NULL
 	`
 
 	if filter.Name != nil {
-		conditions = append(conditions, fmt.Sprintf("name = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("name = $%d", len(args)+1))
 		args = append(args, *filter.Name)
 	}
 
 	if filter.UserName != nil {
-		conditions = append(conditions, fmt.Sprintf("user_name = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("user_name = $%d", len(args)+1))
 		args = append(args, *filter.UserName)
 	}
 
 	if filter.Rank != nil {
-		conditions = append(conditions, fmt.Sprintf("rank = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("rank = $%d", len(args)+1))
 		args = append(args, *filter.Rank)
 	}
 
 	if filter.CreatedAt != nil {
-		conditions = append(conditions, fmt.Sprintf("created_at = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("created_at = $%d", len(args)+1))
 		args = append(args, *filter.CreatedAt)
 	}
 
 	if filter.UpdatedAt != nil {
-		conditions = append(conditions, fmt.Sprintf("updated_at = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("updated_at = $%d", len(args)+1))
 		args = append(args, *filter.UpdatedAt)
 	}
 
-	conditions = append(conditions, "deleted_at IS NULL")
-
-	if len(conditions) > 0 {
-		query += " WHERE " + strings.Join(conditions, " AND ")
+	if len(params) > 0 {
+		query += strings.Join(params, " AND ")
 	}
 
 	if filter.Limit != nil {
@@ -86,9 +84,8 @@ func (u UserRepository) GetAllUsers(filter UserFilter) ([]models.User, error) {
 		query += fmt.Sprintf(" OFFSET %d", *filter.Offset)
 	}
 
-	// Debugging:
-	fmt.Println("Executing query:", query)
-	fmt.Println("With arguments:", args)
+	// fmt.Println("Executing query:", query)
+	// fmt.Println("With arguments:", args)
 
 	rows, err := u.db.Query(query, args...)
 	if err != nil {
@@ -110,6 +107,69 @@ func (u UserRepository) GetAllUsers(filter UserFilter) ([]models.User, error) {
 
 	return users, nil
 }
+
+// func (u UserRepository) GetAllUsers(filter UserFilter) error{
+// 	var users []models.User
+
+// 	param := make(map[string]interface{})
+// 	args := []interface
+
+// 	query := `
+// 		SELECT
+// 			id,
+// 			Name,
+// 			UserName,
+// 			Password,
+// 			Rank,
+// 			CreatedAt,
+// 			UpdatedAt
+// 		FROM users
+// 		WEHRE deleted_at IS NULL
+// 	`
+// 	f := ""
+
+// 	if filter.Name != nil{
+// 		param["name"] = filter.Name
+// 		f += "AND name = $"
+// 	}
+// 	if filter.Rank != nil{
+// 		param["rank"] += filter.Rank
+// 		f += "AND name = $"
+
+// 	}
+
+// 	if filter.UserName != nil{
+// 		param["user_name"] = filter.UserName
+// 		f += "AND user_name = $"
+
+// 	}
+
+// 	if filter.CreatedAt != nil{
+// 		param["created_at"] = filter.CreatedAt
+// 		f += "AND created_at = $"
+
+// 	}
+
+// 	if filter.UpdatedAt != nil{
+// 		param["upadted_at"] = filter.UpdatedAt
+// 		f += "AND updated_at = $"
+// 	}
+
+// 	if filter.Limit != nil{
+// 		param["limit"] += filter.Limit
+// 		f += "LIMIT $"
+// 	}
+
+// 	if filter.Offset != nil{
+// 		param["offset"] += filter.Offset
+// 		f += "OFFSET $"
+// 	}
+// 	i := 1
+// 	for
+
+// 	u.db.Exec(query, )
+
+// }
 
 func (u UserRepository) CreateUser(user *models.User) error {
 	id := uuid.NewString()
@@ -157,7 +217,7 @@ func (u UserRepository) DeleteUser(userId string) error {
 }
 
 func (u UserRepository) UpdateUser(userId string, updateFilter UpdateUser) error {
-	var conditions []string
+	var params []string
 	var args []interface{}
 
 	query := `
@@ -175,31 +235,31 @@ func (u UserRepository) UpdateUser(userId string, updateFilter UpdateUser) error
 	`
 
 	if updateFilter.Name != nil {
-		conditions = append(conditions, fmt.Sprintf("name = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("name = $%d", len(args)+1))
 		args = append(args, *updateFilter.Name)
 	}
 
 	if updateFilter.Rank != nil {
-		conditions = append(conditions, fmt.Sprintf("rank = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("rank = $%d", len(args)+1))
 		args = append(args, *updateFilter.Rank)
 	}
 
 	if updateFilter.UserName != nil {
-		conditions = append(conditions, fmt.Sprintf("user_name = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("user_name = $%d", len(args)+1))
 		args = append(args, *updateFilter.UserName)
 	}
 
 	if updateFilter.Password != nil {
-		conditions = append(conditions, fmt.Sprintf("password = $%d", len(args)+1))
+		params = append(params, fmt.Sprintf("password = $%d", len(args)+1))
 		args = append(args, *updateFilter.Password)
 	}
 
-	if len(conditions) == 0 {
+	if len(params) == 0 {
 		return fmt.Errorf("no fields to update")
 	}
 
 	args = append(args, userId)
-	query += strings.Join(conditions, ", ") + fmt.Sprintf(" WHERE id = $%d AND deleted_at IS NULL", len(args))
+	query += strings.Join(params, ", ") + fmt.Sprintf(" WHERE id = $%d AND deleted_at IS NULL", len(args))
 
 	fmt.Println("Executing query:", query)
 	fmt.Println("With arguments:", args)

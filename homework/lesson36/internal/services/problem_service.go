@@ -1,13 +1,13 @@
 package services
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/Go11Group/Javokhir-A/homework/lesson36/internal/models"
 	"github.com/Go11Group/Javokhir-A/homework/lesson36/internal/repositories"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 type ProblemService struct {
@@ -19,96 +19,87 @@ func NewProblemService(problemRepo *repositories.ProblemRepository) *ProblemServ
 		problemRepo: problemRepo,
 	}
 }
-
-func (p *ProblemService) CreateProblem(w http.ResponseWriter, r *http.Request) {
-	newProblem := models.Problem{}
-	if err := json.NewDecoder(r.Body).Decode(&newProblem); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+func (u *ProblemService) CreateProblem(c *gin.Context) {
+	var problem models.Problem
+	if err := c.BindJSON(&problem); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "binding request body's json to struct failed: " + err.Error()})
 		return
 	}
 
-	if err := p.problemRepo.CreateProblem(&newProblem); err != nil {
-		http.Error(w, err.Error(), http.StatusConflict)
+	if err := u.problemRepo.CreateProblem(&problem); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Creating problem data in database failed: " + err.Error()})
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	c.JSON(http.StatusOK, gin.H{"message": "Problem successfully created"})
 }
 
-func (p *ProblemService) GetAllProblems(w http.ResponseWriter, r *http.Request) {
+func (u *ProblemService) GetAllProblems(ctx *gin.Context) {
 	var filter repositories.ProblemFilter
 
-	w.Header().Set("content-type", "application/json")
-
-	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
-		log.Println("Failed while validating problem filter:" + err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := ctx.BindJSON(&filter); err != nil {
+		ctx.JSON(http.StatusBadRequest, &filter)
+		log.Println("Getting filter from request failed: " + err.Error())
 		return
 	}
 
-	problems, err := p.problemRepo.GetAllProblems(filter)
+	problems, err := u.problemRepo.GetAllProblems(filter)
+
 	if err != nil {
-		log.Fatal("getting all problems by filter failed: " + err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Failed to fetch problems: " + err.Error()})
 	}
 
-	if err := json.NewEncoder(w).Encode(problems); err != nil {
-		log.Println("Failed while transferring date into response: " + err.Error())
-		http.Error(w, err.Error(), http.StatusNoContent)
-		return
-	}
+	ctx.JSON(http.StatusOK, problems)
+
 }
+func (u *ProblemService) GetProblem(ctx *gin.Context) {
 
-func (p *ProblemService) GetProblem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	problemId := vars["id"]
+	id := ctx.Param("id")
 
-	w.Header().Set("content-type", "application/json")
+	if id == "" {
+		ctx.JSON(
+			http.StatusBadRequest, gin.H{"error": "check for manual url request"},
+		)
+		log.Println("id must be string: ")
+		return
+	}
 
-	problem, err := p.problemRepo.GetProblem(problemId)
+	problem, err := u.problemRepo.GetProblem(id)
 	if err != nil {
-		log.Println("Getting problem from database failed:" + err.Error())
-		http.Error(w, "Problem not found"+err.Error(), http.StatusNotFound)
-		return
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	if err := json.NewEncoder(w).Encode(&problem); err != nil {
-		log.Println("Writing to response failed:" + err.Error())
-		http.Error(w, "Writing to response body failed:"+err.Error(), http.StatusBadRequest)
-	}
+	ctx.JSON(http.StatusOK, problem)
+
 }
 
-func (p *ProblemService) UpdateProblem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func (u *ProblemService) UpdateProblem(ctx *gin.Context) {
+	var updatingProblem repositories.UpdateProblem
 
-	var updateFilter repositories.UpdateProblem
-
-	if err := json.NewDecoder(r.Body).Decode(&updateFilter); err != nil {
-		http.Error(w, "decoding to update filter failed: "+err.Error(), http.StatusBadRequest)
-		log.Println(err.Error())
+	if err := ctx.BindJSON(&updatingProblem); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "updating problem by query failed: " + err.Error()})
 		return
 	}
 
-	if err := p.problemRepo.UpdateProblem(id, updateFilter); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		log.Println("Failed updating problem: " + err.Error())
+	id := ctx.Param("id")
+
+	if err := u.problemRepo.UpdateProblem(id, updatingProblem); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal updating failed: " + err.Error()})
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Problem successfully updated"))
+	ctx.JSON(http.StatusOK, gin.H{"message": "user data successfully updated"})
+
 }
 
-func (p *ProblemService) DeleteProblem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func (p *ProblemService) DeleteProblem(c *gin.Context) {
+
+	id := c.Param("id")
 
 	if err := p.problemRepo.DeleteProblem(id); err != nil {
-		http.Error(w, err.Error(), http.StatusNotImplemented)
+		c.JSON(http.StatusForbidden, gin.H{"error": "deleting problem failed: " + err.Error()})
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("problem id %s deleted", id)})
 }

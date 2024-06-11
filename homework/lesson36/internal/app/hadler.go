@@ -11,8 +11,18 @@ func SetupHandlers(router *gin.Engine, userSer *services.UsersService, problemSe
 	user.GET("/:id", userSer.GetUser)
 	user.PUT("/:id", userSer.UpdateUser)
 	user.DELETE("/:id", userSer.DeleteUser)
-	user.GET("s/", userSer.GetAllUsers)
+	user.GET("/getall", userSer.GetAllUsers)
 
+	problem := router.Group("/problem")
+
+	problem.GET("/:id", problemSer.GetProblem)
+	problem.PUT("/:id", problemSer.UpdateProblem)
+	problem.DELETE("/:id", problemSer.DeleteProblem)
+	problem.GET("s/", problemSer.GetAllProblems)
+
+	// solved_problem := router.Group("/solved_problem")
+
+	// solved_problem.GET("/:")
 	// router.POST("/user", userSer.CreateUser)
 	// router.PUT("/user/:id", userSer.UpdateUser)
 	// router.DELETE("/user/:id", userSer.DeleteUser)
