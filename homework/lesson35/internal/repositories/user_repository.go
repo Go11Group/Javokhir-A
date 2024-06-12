@@ -194,7 +194,6 @@ func (u UserRepository) UpdateUser(userId string, updateFilter UpdateUser) error
 		args = append(args, *updateFilter.Password)
 	}
 
-	// Check if there are any fields to update
 	if len(conditions) == 0 {
 		return fmt.Errorf("no fields to update")
 	}
@@ -202,7 +201,6 @@ func (u UserRepository) UpdateUser(userId string, updateFilter UpdateUser) error
 	args = append(args, userId)
 	query += strings.Join(conditions, ", ") + fmt.Sprintf(" WHERE id = $%d AND deleted_at IS NULL", len(args))
 
-	// Debugging: Print the query and arguments
 	fmt.Println("Executing query:", query)
 	fmt.Println("With arguments:", args)
 
