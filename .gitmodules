@@ -1,0 +1,3 @@
+[submodule "exam-2/exam-2/languge-learning-app"]
+	path = exam-2/exam-2/languge-learning-app
+	url = git@github.com:golang-standards/project-layout.git
