@@ -152,6 +152,9 @@ func (u UserRepository) DeleteUser(userId string) error {
 	`
 
 	if _, err := u.db.Exec(query, userId); err != nil {
+		if sql.ErrNoRows == err {
+			return errors.New("not found")
+		}
 		return fmt.Errorf("failed to delete user by this id: %v", err)
 	}
 

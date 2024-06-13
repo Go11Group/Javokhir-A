@@ -73,10 +73,15 @@ func (uh *UserHandler) UpdateUser(c *gin.Context) {
 
 func (uh *UserHandler) DeleteUser(c *gin.Context) {
 	userId := c.Param("id")
-
+	codeErr := http.StatusBadRequest
+	errMsg := ""
 	err := uh.UserService.DeleteUser(userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err.Error() == "not found" {
+			codeErr = http.StatusNotFound
+			errMsg = "no such user by this id"
+		}
+		c.JSON(codeErr, gin.H{"error": errMsg + err.Error()})
 		return
 	}
 

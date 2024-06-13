@@ -22,5 +22,5 @@ func (s Server) Start(addr string) {
 
 	routes.SetupRoutes(router, s.db)
 
-	router.Run()
+	router.Run(addr)
 }

@@ -14,5 +14,5 @@ func main() {
 	}
 
 	server := config.InitServer(db)
-	server.Start(":8080")
+	server.Start(":8070")
 }
