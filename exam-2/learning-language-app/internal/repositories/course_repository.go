@@ -12,32 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// plan for course repo
-type CourseRepositoryPlan interface {
-	CreateUser(course models.Course) error
-	GetUserByID(courseId string) (models.Course, error)
-	UpdateUser(course models.Course) error
-	DeleteUser(courseId string) error
-	GetAllUsers() ([]models.Course, error)
-}
-
-type CourseFilter struct {
-	Title       *string    `json:"title"`
-	Description *string    `json:"description"`
-	CreatedAt   *time.Time `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
-	Limit       *int       `json:"limit"`
-	Offset      *int       `json:"offset"`
-}
-
-type CourseRepository struct {
-	db *sql.DB
-}
-
-func NewCourseRepository(db *sql.DB) *CourseRepository {
-	return &CourseRepository{db: db}
-}
-
 func (c *CourseRepository) CreateCourse(course *models.Course) error {
 	query := `INSERT INTO courses (course_id, title, description)
               VALUES ($1, $2, $3)`

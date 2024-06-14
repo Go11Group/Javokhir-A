@@ -7,17 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// / Additional APIs
-type Course struct {
-	CourseID    uuid.UUID `json:"course_id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-}
-type UserCourses struct {
-	UserID  uuid.UUID `json:"user_id"`
-	Courses []Course  `json:"courses"`
-}
-
 func (c *CourseRepository) GetCourseByUser(userID uuid.UUID) (*UserCourses, error) {
 	query := `
 		SELECT  c.course_id, c.title, c.description
@@ -99,20 +88,6 @@ func (c *CourseRepository) GetEnrolledUsersByCourse(courseID uuid.UUID) (*Enroll
 		CourseID:      courseID,
 		EnrolledUsers: users,
 	}, nil
-}
-
-type TimePeriod struct {
-	StartDate string `json:"start_date"`
-	EndDate   string `json:"end_date"`
-}
-type PopularCourse struct {
-	CourseID         uuid.UUID `json:"course_id"`
-	CourseTitle      string    `json:"course_title"`
-	EnrollmentsCount int       `json:"enrollements_count"`
-}
-type ResponseCourse struct {
-	TimePeriod     TimePeriod      `json:"time_period"`
-	PopularCourses []PopularCourse `json:"popular_courses"`
 }
 
 func (c *CourseRepository) GetMostPopularCourses(startDate, endDate time.Time) (*ResponseCourse, error) {

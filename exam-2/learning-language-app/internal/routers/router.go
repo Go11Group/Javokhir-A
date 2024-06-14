@@ -15,6 +15,7 @@ func SetupRouter(router *gin.Engine, userHandler *handlers.UserHandler, lessonHa
 			users.GET("/:id", userHandler.GetUserByID)
 			users.PUT("/:id", userHandler.UpdateUser)
 			users.DELETE("/:id", userHandler.DeleteUser)
+			users.GET("/:id/progres", userHandler.GetUserProgressByUserID)
 		}
 
 		lessons := api.Group("/lesson")
@@ -38,6 +39,7 @@ func SetupRouter(router *gin.Engine, userHandler *handlers.UserHandler, lessonHa
 			courses.GET("/:id/courses", courseHandler.GetCourseByUser)
 			courses.GET("/:id/enrollments", courseHandler.GetEnroleldUsersByCourse)
 			courses.GET("/popular", courseHandler.GetMostPopularCoursesHandler)
+
 		}
 
 		enrollments := api.Group("/enrollment")

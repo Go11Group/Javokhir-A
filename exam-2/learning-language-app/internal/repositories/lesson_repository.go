@@ -2,68 +2,14 @@ package repositories
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
 	"github.com/google/uuid"
 )
-
-// Plan for lesson repo
-type LessonRepositoryPlan interface {
-	CreateLesson(lesson models.Lesson) error
-	GetLessonByID(lessonID string) (models.Lesson, error)
-	UpdateLesson(lesson models.Lesson) error
-	DeleteLesson(lessonID string) error
-	GetAllLessons(filter *LessonFilter, ctx context.Context) ([]models.Lesson, error)
-}
-
-type LessonFilter struct {
-	CourseID  *uuid.UUID `json:"course_id"`
-	Title     *string    `json:"title"`
-	Content   *string    `json:"content"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-	Limit     *int       `json:"limit"`
-	Offset    *int       `json:"offset"`
-}
-
-type CreateLesson struct {
-	LessonID *uuid.UUID `json:"lesson_id"`
-	CourseID *uuid.UUID `json:"course_id"`
-	Title    *string    `json:"title"`
-	Content  *string    `json:"content"`
-}
-
-type UpdateLesson struct {
-	Title   *string `json:"title"`
-	Content *string `json:"content"`
-}
-
-type CourseLessons struct {
-	CourseID uuid.UUID `json:"course_id"`
-	Lessons  []Lesson  `json:"lessons"`
-}
-
-type Lesson struct {
-	Lesson_id uuid.UUID `json:"lesson_id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-}
-
-type LessonRepository struct {
-	db *sql.DB
-}
-
-func NewLessonRepository(db *sql.DB) *LessonRepository {
-	return &LessonRepository{
-		db: db,
-	}
-}
 
 func (l *LessonRepository) CreateLesson(lesson *CreateLesson, courseID uuid.UUID) error {
 	lessonId := uuid.New()
@@ -192,32 +138,4 @@ func (l *LessonRepository) GetAllLessons(ctx context.Context, lf LessonFilter) (
 	}
 
 	return lessons, nil
-}
-
-func (l *LessonRepository) GetLessonByCourse(courseID uuid.UUID) (*CourseLessons, error) {
-	query := `
-		SELECT lesson_id, title, content 
-		FROM lessons
-		WHERE course_id = $1 AND deleted_at IS NULL
-	`
-
-	rows, err := l.db.Query(query, courseID)
-	if err != nil {
-		return nil, fmt.Errorf("no rows found" + err.Error())
-	}
-
-	var lessons []Lesson
-	for rows.Next() {
-		var lesson Lesson
-		if err := rows.Scan(&lesson.Lesson_id, &lesson.Title, &lesson.Content); err != nil {
-			return nil, fmt.Errorf("faield while iterating through rows")
-		}
-		lessons = append(lessons, lesson)
-	}
-
-	return &CourseLessons{
-		CourseID: courseID,
-		Lessons:  lessons,
-	}, nil
-
 }

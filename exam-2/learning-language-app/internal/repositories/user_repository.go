@@ -11,33 +11,6 @@ import (
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
 )
 
-// plan for user repo
-type UserRepositoryPlan interface {
-	CreateUser(user models.User) error
-	GetUserByID(userID string) (models.User, error)
-	UpdateUser(user models.User) error
-	DeleteUser(userID string) error
-	GetAllUsers() ([]models.User, error)
-}
-
-type UserFilter struct {
-	Name      *string    `json:"name"`
-	Email     *string    `json:"email"`
-	Birthday  *time.Time `json:"birthday"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-	Limit     *int       `json:"limit"`
-	Offset    *int       `json:"offset"`
-}
-
-type UserRepository struct {
-	db *sql.DB
-}
-
-func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{db: db}
-}
-
 func (u *UserRepository) CreateUser(user *models.User) error {
 	query := `INSERT INTO users (user_id, name, email, birthday, password)
               VALUES ($1, $2, $3, $4, $5)`

@@ -188,3 +188,7 @@ func (us UserService) GetAllUsers(filter *repositories.UserFilter) ([]models.Use
 		return nil, err
 	}
 }
+
+func (us *UserService) GetUserProgressByUserID(userID uuid.UUID) (*repositories.UserProgressResponse, error) {
+	return us.UserRepository.GetUserProgressByUserID(userID)
+}

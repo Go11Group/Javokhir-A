@@ -118,3 +118,22 @@ func (uh UserHandler) GetAllUsers(c *gin.Context) {
 
 	c.JSON(http.StatusFound, &users)
 }
+
+func (uh *UserHandler) GetUserProgressByUserID(c *gin.Context) {
+	userID := c.Param("id")
+
+	// Parse the userID string into a UUID
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user_id format"})
+		return
+	}
+
+	response, err := uh.UserService.GetUserProgressByUserID(parsedUserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
