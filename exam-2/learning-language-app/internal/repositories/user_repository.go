@@ -38,20 +38,20 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) CreateUser(user *models.User) error {
+func (u *UserRepository) CreateUser(user *models.User) error {
 	query := `INSERT INTO users (user_id, name, email, birthday, password)
               VALUES ($1, $2, $3, $4, $5)`
-	_, err := r.db.Exec(query, user.UserID, user.Name, user.Email, user.Birthday, user.Password)
+	_, err := u.db.Exec(query, user.UserID, user.Name, user.Email, user.Birthday, user.Password)
 	if err != nil {
 		return fmt.Errorf("failed execute the query")
 	}
 	return nil
 }
 
-func (r *UserRepository) GetUserByID(userID string) (models.User, error) {
+func (u *UserRepository) GetUserByID(userID string) (models.User, error) {
 	query := `SELECT user_id, name, email, birthday, password, created_at, updated_at, deleted_at 
               FROM users WHERE user_id = $1 and deleted_at IS NULL`
-	row := r.db.QueryRow(query, userID)
+	row := u.db.QueryRow(query, userID)
 
 	var user models.User
 	err := row.Scan(&user.UserID, &user.Name, &user.Email, &user.Birthday, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
@@ -65,18 +65,18 @@ func (r *UserRepository) GetUserByID(userID string) (models.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) UpdateUser(user models.User) error {
+func (u *UserRepository) UpdateUser(user models.User) error {
 	query := `UPDATE users SET name = $1, email = $2, birthday = $3, password = $4, updated_at = $5 WHERE user_id = $6 and deleted_at IS NULL`
-	_, err := r.db.Exec(query, user.Name, user.Email, user.Birthday, user.Password, time.Now(), user.UserID)
+	_, err := u.db.Exec(query, user.Name, user.Email, user.Birthday, user.Password, time.Now(), user.UserID)
 	return err
 }
 
-func (r *UserRepository) DeleteUser(userID string) error {
+func (u *UserRepository) DeleteUser(userID string) error {
 	query := `UPDATE FROM users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = $1 and deleted_at IS NULL`
-	_, err := r.db.Exec(query, userID)
+	_, err := u.db.Exec(query, userID)
 	return err
 }
-func (r *UserRepository) GetAllUsers(f *UserFilter, ctx context.Context) ([]models.User, error) {
+func (u *UserRepository) GetAllUsers(f *UserFilter, ctx context.Context) ([]models.User, error) {
 	query := `SELECT user_id, name, email, birthday, password, created_at, updated_at FROM users WHERE deleted_at IS NULL`
 
 	var conditions []string
@@ -116,7 +116,7 @@ func (r *UserRepository) GetAllUsers(f *UserFilter, ctx context.Context) ([]mode
 	}
 
 	fmt.Println(query, args)
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := u.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +134,6 @@ func (r *UserRepository) GetAllUsers(f *UserFilter, ctx context.Context) ([]mode
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	fmt.Println(users)
+	// fmt.Println(users)
 	return users, nil
 }

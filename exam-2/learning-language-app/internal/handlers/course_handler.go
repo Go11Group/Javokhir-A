@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/repositories"
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/services"
@@ -116,4 +117,68 @@ func (ch CourseHandler) GetAllCourses(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusFound, &courses)
+}
+
+func (ch CourseHandler) GetCourseByUser(c *gin.Context) {
+	id := c.Param("id")
+	uuID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is not valid"})
+		return
+	}
+
+	userCourses, err := ch.CourseService.GetCourseByUser(uuID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get course: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, userCourses)
+}
+
+func (ch CourseHandler) GetEnroleldUsersByCourse(c *gin.Context) {
+	id := c.Param("id")
+	courseID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid course id"})
+		return
+	}
+
+	enUsers, err := ch.CourseService.GetEnroleldUsersByCourse(courseID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to fetch data or no records found:" + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusFound, enUsers)
+}
+
+func (ch *CourseHandler) GetMostPopularCoursesHandler(c *gin.Context) {
+	var timePeriod repositories.TimePeriod
+
+	if err := c.ShouldBindJSON(&timePeriod); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON input"})
+		return
+	}
+
+	startDate, err := time.Parse("2006-01-02", timePeriod.StartDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid start_date format"})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", timePeriod.EndDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid end_date format"})
+		return
+	}
+
+	response, err := ch.CourseService.GetMostPopularCourses(startDate, endDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the response
+	c.JSON(http.StatusOK, response)
 }

@@ -1,10 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Lesson struct {
-	LessonID  string     `json:"lesson_id"`
-	CourseID  string     `json:"course_id"`
+	LessonID  uuid.UUID  `json:"lesson_id"`
+	CourseID  uuid.UUID  `json:"course_id"`
 	Title     string     `json:"title"`
 	Content   string     `json:"content"`
 	CreatedAt time.Time  `json:"created_at"`

@@ -5,10 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
+	"github.com/google/uuid"
 )
 
 // Plan for lesson repo
@@ -21,13 +23,36 @@ type LessonRepositoryPlan interface {
 }
 
 type LessonFilter struct {
-	CourseID  *string    `json:"course_id"`
+	CourseID  *uuid.UUID `json:"course_id"`
 	Title     *string    `json:"title"`
 	Content   *string    `json:"content"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	Limit     *int       `json:"limit"`
 	Offset    *int       `json:"offset"`
+}
+
+type CreateLesson struct {
+	LessonID *uuid.UUID `json:"lesson_id"`
+	CourseID *uuid.UUID `json:"course_id"`
+	Title    *string    `json:"title"`
+	Content  *string    `json:"content"`
+}
+
+type UpdateLesson struct {
+	Title   *string `json:"title"`
+	Content *string `json:"content"`
+}
+
+type CourseLessons struct {
+	CourseID uuid.UUID `json:"course_id"`
+	Lessons  []Lesson  `json:"lessons"`
+}
+
+type Lesson struct {
+	Lesson_id uuid.UUID `json:"lesson_id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
 }
 
 type LessonRepository struct {
@@ -40,103 +65,159 @@ func NewLessonRepository(db *sql.DB) *LessonRepository {
 	}
 }
 
-func (r *LessonRepository) CreateLesson(lesson *models.Lesson) error {
-	query := `INSERT INTO lessons (lesson_id, course_id, title, content, created_at, updated_at)
-              VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.Exec(query, lesson.LessonID, lesson.CourseID, lesson.Title, lesson.Content, lesson.CreatedAt, lesson.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to execute the query: %w", err)
-	}
-	return nil
+func (l *LessonRepository) CreateLesson(lesson *CreateLesson, courseID uuid.UUID) error {
+	lessonId := uuid.New()
+	query := `
+		INSERT INTO lessons(lesson_id, course_id, title, content)
+		VALUES($1, $2, $3, $4)
+	`
+	_, err := l.db.Exec(query, lessonId, courseID, lesson.Title, lesson.Content)
+
+	return err
 }
 
-func (r *LessonRepository) GetLessonByID(lessonID string) (models.Lesson, error) {
-	query := `SELECT lesson_id, course_id, title, content, created_at, updated_at
-              FROM lessons WHERE lesson_id = $1 AND deleted_at IS NULL`
-	row := r.db.QueryRow(query, lessonID)
+func (l *LessonRepository) GetLessonByID(lessonID uuid.UUID) (*models.Lesson, error) {
+	qury := `
+		SELECT lesson_id, course_id, title, content, created_at, updated_at
+		FROM lessons WHERE deleted_at IS NULL AND lesson_id = $1
+	`
 
+	row := l.db.QueryRow(qury, lessonID)
 	var lesson models.Lesson
-	err := row.Scan(&lesson.LessonID, &lesson.CourseID, &lesson.Title, &lesson.Content, &lesson.CreatedAt, &lesson.UpdatedAt)
+
+	err := row.Scan(&lesson.LessonID, &lesson.CourseID, &lesson.Title, &lesson.Content)
+
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return lesson, errors.New("lesson not found")
-		}
-		return lesson, err
+		return nil, errors.New("NotFound")
 	}
 
-	return lesson, nil
+	return &lesson, nil
 }
 
-func (r *LessonRepository) UpdateLesson(lesson models.Lesson) error {
-	query := `UPDATE lessons SET course_id = $1, title = $2, content = $3, updated_at = $4 WHERE lesson_id = $5 AND deleted_at IS NULL`
-	_, err := r.db.Exec(query, lesson.CourseID, lesson.Title, lesson.Content, time.Now(), lesson.LessonID)
+func (l *LessonRepository) UpdateLesson(lf UpdateLesson, lessonID uuid.UUID) error {
+	query := `
+		UPDATE lessons SET 
+	`
+	conditions := []string{}
+	args := []interface{}{}
+
+	if lf.Title != nil {
+		conditions = append(conditions, fmt.Sprintf("title = $%d", len(args)+1))
+		args = append(args, *lf.Title)
+	}
+
+	if lf.Content != nil {
+		conditions = append(conditions, fmt.Sprintf("content = $%d", len(args)+1))
+		args = append(args, *lf.Content)
+	}
+
+	if len(conditions) > 0 {
+		query += strings.Join(conditions, " , ") + `, updated_at = CURRENT_TIMESTAMP 
+		WHERE deleted_at IS NULL AND lesson_id = $` + strconv.Itoa(len(args)+1)
+	} else {
+		return errors.New("NoUpdate")
+	}
+	args = append(args, lessonID)
+
+	_, err := l.db.Exec(query, args...)
+
 	return err
 }
 
-func (r *LessonRepository) DeleteLesson(lessonID string) error {
-	query := `UPDATE lessons SET deleted_at = CURRENT_TIMESTAMP WHERE lesson_id = $1 AND deleted_at IS NULL`
-	_, err := r.db.Exec(query, lessonID)
+func (l *LessonRepository) DeleteLesson(lessonID uuid.UUID) error {
+	query := `UPDATE lessons SET deleted_at = CURRENT_TIMESTAMP WHERE deleted_at IS NULL and lesson_id = $1`
+
+	_, err := l.db.Exec(query, lessonID)
+
 	return err
 }
-
-func (r *LessonRepository) GetAllLessons(f *LessonFilter, ctx context.Context) ([]models.Lesson, error) {
-	query := `SELECT lesson_id, course_id, title, content, created_at, updated_at
-	          FROM lessons WHERE deleted_at IS NULL`
-
+func (l *LessonRepository) GetAllLessons(ctx context.Context, lf LessonFilter) ([]*models.Lesson, error) {
 	var conditions []string
 	var args []interface{}
 
-	if f.CourseID != nil {
+	query := `
+        SELECT lesson_id, course_id, title, content, created_at, updated_at FROM lessons
+        WHERE deleted_at IS NULL   
+    `
+
+	if lf.CourseID != nil {
 		conditions = append(conditions, fmt.Sprintf("course_id = $%d", len(args)+1))
-		args = append(args, *f.CourseID)
+		args = append(args, *lf.CourseID)
 	}
-	if f.Title != nil {
+	if lf.Title != nil {
 		conditions = append(conditions, fmt.Sprintf("title = $%d", len(args)+1))
-		args = append(args, *f.Title)
+		args = append(args, *lf.Title)
 	}
-	if f.Content != nil {
+	if lf.Content != nil {
 		conditions = append(conditions, fmt.Sprintf("content = $%d", len(args)+1))
-		args = append(args, *f.Content)
+		args = append(args, *lf.Content)
 	}
-	if f.CreatedAt != nil {
-		conditions = append(conditions, fmt.Sprintf("created_at >= $%d AND created_at < $%d", len(args)+1, len(args)+2))
-		args = append(args, *f.CreatedAt, f.CreatedAt.AddDate(0, 0, 1))
+	if lf.CreatedAt != nil {
+		conditions = append(conditions, "DATE(created_at) = $"+strconv.Itoa(len(args)+1))
+		args = append(args, lf.CreatedAt.Format("2006-01-02"))
 	}
-	if f.UpdatedAt != nil {
-		conditions = append(conditions, fmt.Sprintf("updated_at >= $%d AND updated_at < $%d", len(args)+1, len(args)+2))
-		args = append(args, *f.UpdatedAt, f.UpdatedAt.AddDate(0, 0, 1))
+	if lf.UpdatedAt != nil {
+		conditions = append(conditions, "DATE(updated_at) = $"+strconv.Itoa(len(args)+1))
+		args = append(args, lf.UpdatedAt.Format("2006-01-02"))
 	}
 
 	if len(conditions) > 0 {
 		query += " AND " + strings.Join(conditions, " AND ")
 	}
 
-	if f.Limit != nil {
-		query += fmt.Sprintf(" LIMIT %d", *f.Limit)
+	if lf.Limit != nil {
+		query += fmt.Sprintf(" LIMIT %d", *lf.Limit)
+	}
+	if lf.Offset != nil {
+		query += fmt.Sprintf(" OFFSET %d", *lf.Offset)
 	}
 
-	if f.Offset != nil {
-		query += fmt.Sprintf(" OFFSET %d", *f.Offset)
-	}
-
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := l.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch lessons: %w", err)
 	}
 	defer rows.Close()
 
-	var lessons []models.Lesson
+	var lessons []*models.Lesson
 	for rows.Next() {
 		var lesson models.Lesson
-		err := rows.Scan(&lesson.LessonID, &lesson.CourseID, &lesson.Title, &lesson.Content, &lesson.CreatedAt, &lesson.UpdatedAt)
-		if err != nil {
+		if err := rows.Scan(&lesson.LessonID, &lesson.CourseID, &lesson.Title, &lesson.Content, &lesson.CreatedAt, &lesson.UpdatedAt); err != nil {
 			return nil, err
+		}
+		lessons = append(lessons, &lesson)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error while iterating over lessons: %w", err)
+	}
+
+	return lessons, nil
+}
+
+func (l *LessonRepository) GetLessonByCourse(courseID uuid.UUID) (*CourseLessons, error) {
+	query := `
+		SELECT lesson_id, title, content 
+		FROM lessons
+		WHERE course_id = $1 AND deleted_at IS NULL
+	`
+
+	rows, err := l.db.Query(query, courseID)
+	if err != nil {
+		return nil, fmt.Errorf("no rows found" + err.Error())
+	}
+
+	var lessons []Lesson
+	for rows.Next() {
+		var lesson Lesson
+		if err := rows.Scan(&lesson.Lesson_id, &lesson.Title, &lesson.Content); err != nil {
+			return nil, fmt.Errorf("faield while iterating through rows")
 		}
 		lessons = append(lessons, lesson)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return lessons, nil
+	return &CourseLessons{
+		CourseID: courseID,
+		Lessons:  lessons,
+	}, nil
+
 }

@@ -156,3 +156,15 @@ func (cs CourseService) GetAllCourses(filter *repositories.CourseFilter) ([]mode
 		return nil, err
 	}
 }
+
+func (cs *CourseService) GetCourseByUser(userID uuid.UUID) (*repositories.UserCourses, error) {
+	return cs.CourseRepository.GetCourseByUser(userID)
+}
+
+func (cs *CourseService) GetEnroleldUsersByCourse(courseID uuid.UUID) (*repositories.EnrolledUsers, error) {
+	return cs.CourseRepository.GetEnrolledUsersByCourse(courseID)
+}
+
+func (cs *CourseService) GetMostPopularCourses(startDate, endDate time.Time) (*repositories.ResponseCourse, error) {
+	return cs.CourseRepository.GetMostPopularCourses(startDate, endDate)
+}
