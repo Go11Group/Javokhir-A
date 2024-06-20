@@ -11,6 +11,10 @@ import (
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
 )
 
+func NewEnrollmentRepository(db *sql.DB) *EnrollmentRepository {
+	return &EnrollmentRepository{db: db}
+}
+
 func (r *EnrollmentRepository) EnrollUser(enrollment models.Enrollment) error {
 	query := `INSERT INTO enrollments (enrollment_id, user_id, course_id, enrollment_date)
               VALUES ($1, $2, $3, $4)`
@@ -74,11 +78,11 @@ func (r *EnrollmentRepository) GetAllEnrollments(ctx *context.Context, f Enrollm
 	}
 
 	if f.Limit != nil {
-		query += fmt.Sprintf("LIMIT %d", *f.Limit)
+		query += fmt.Sprintf(" LIMIT %d", *f.Limit)
 	}
 
 	if f.Offset != nil {
-		query += fmt.Sprintf("OFFSET %d", *f.Offset)
+		query += fmt.Sprintf(" OFFSET %d", *f.Offset)
 	}
 	fmt.Println(query)
 	rows, err := r.db.QueryContext(*ctx, query, args...)

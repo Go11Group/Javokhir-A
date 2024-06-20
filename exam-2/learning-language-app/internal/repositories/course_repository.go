@@ -12,6 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
+func NewCourseRepository(db *sql.DB) *CourseRepository {
+	return &CourseRepository{db: db}
+}
+
 func (c *CourseRepository) CreateCourse(course *models.Course) error {
 	query := `INSERT INTO courses (course_id, title, description)
               VALUES ($1, $2, $3)`

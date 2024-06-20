@@ -37,6 +37,7 @@ type UserCourses struct {
 	Courses []Course  `json:"courses"`
 }
 
+// ///////////////////
 // These structs are used to find the most popular course in a time of interval
 type TimePeriod struct {
 	StartDate string `json:"start_date"`
@@ -52,10 +53,7 @@ type ResponseCourse struct {
 	PopularCourses []PopularCourse `json:"popular_courses"`
 }
 
+// /////////////////
 type CourseRepository struct {
 	db *sql.DB
-}
-
-func NewCourseRepository(db *sql.DB) *CourseRepository {
-	return &CourseRepository{db: db}
 }

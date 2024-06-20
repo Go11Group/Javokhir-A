@@ -31,10 +31,6 @@ type UserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{db: db}
-}
-
 // UserProgress, it is the progress of a user in a course
 type UserProgress struct {
 	CourseID         uuid.UUID `json:"course_id"`

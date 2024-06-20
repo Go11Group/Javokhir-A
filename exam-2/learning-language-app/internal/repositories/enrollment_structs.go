@@ -24,7 +24,3 @@ type EnrollmentFilter struct {
 	Limit          *int    `json:"limit"`
 	Offset         *int    `json:"offset"`
 }
-
-func NewEnrollmentRepository(db *sql.DB) *EnrollmentRepository {
-	return &EnrollmentRepository{db: db}
-}

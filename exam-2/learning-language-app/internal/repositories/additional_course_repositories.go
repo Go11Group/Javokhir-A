@@ -72,17 +72,12 @@ func (c *CourseRepository) GetEnrolledUsersByCourse(courseID uuid.UUID) (*Enroll
 		if err := rows.Scan(&user.UserID, &user.Name, &user.Email); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %v", err)
 		}
-		// fmt.Printf("Fetched user: %+v\n", user)
 		users = append(users, user)
 	}
 
-	// Check for errors during iteration
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error encountered during row iteration: %v", err)
 	}
-
-	// // Debug log to print all users
-	// fmt.Printf("All fetched users: %+v\n", users)
 
 	return &EnrolledUsers{
 		CourseID:      courseID,

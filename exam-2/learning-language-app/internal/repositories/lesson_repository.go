@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -10,6 +11,12 @@ import (
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
 	"github.com/google/uuid"
 )
+
+func NewLessonRepository(db *sql.DB) *LessonRepository {
+	return &LessonRepository{
+		db: db,
+	}
+}
 
 func (l *LessonRepository) CreateLesson(lesson *CreateLesson, courseID uuid.UUID) error {
 	lessonId := uuid.New()

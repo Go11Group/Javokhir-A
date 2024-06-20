@@ -11,6 +11,10 @@ import (
 	"github.com/Go11Group/Javokhir-A/exam-2/learning-language-app/internal/models"
 )
 
+func NewUserRepository(db *sql.DB) *UserRepository {
+	return &UserRepository{db: db}
+}
+
 func (u *UserRepository) CreateUser(user *models.User) error {
 	query := `INSERT INTO users (user_id, name, email, birthday, password)
               VALUES ($1, $2, $3, $4, $5)`
@@ -45,7 +49,7 @@ func (u *UserRepository) UpdateUser(user models.User) error {
 }
 
 func (u *UserRepository) DeleteUser(userID string) error {
-	query := `UPDATE FROM users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = $1 and deleted_at IS NULL`
+	query := `UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = $1 and deleted_at IS NULL`
 	_, err := u.db.Exec(query, userID)
 	return err
 }
