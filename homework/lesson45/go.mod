@@ -1,4 +1,4 @@
-module github.com/Go11Group/Javokhir-A/homework/lesson45/grpc
+module github.com/Go11Group/Javokhir-A/homework/lesson45
 
 go 1.22.3
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package translator;
 
-option go_package = "github.com/Go11Group/Javokhir-A/homework/lesson45/grpc/translator";
+option go_package = "translator/";
 
 service TranslatorService {
     rpc Translator(TranslatingRequest) returns (TranslatingResponse);
