@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package translator;
+
+option go_package = "github.com/Go11Group/Javokhir-A/homework/lesson45/grpc/translator";
+
+service TranslatorService {
+    rpc Translator(TranslatingRequest) returns (TranslatingResponse);
+} 
+
+message TranslatingRequest {
+    string UzWord = 1;
+}
+
+message TranslatingResponse {
+    string EnWord = 1;
+}
