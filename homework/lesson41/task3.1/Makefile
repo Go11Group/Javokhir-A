@@ -1,1 +1,1 @@
-URL = postgres://ahrorbek:	
+URL = postgres://ahrorbek:

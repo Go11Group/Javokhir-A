@@ -22,7 +22,7 @@ func main() {
 
 		var word string
 
-		fmt.Print("Enter a word: ")
+		fmt.Print("Enter an uzbek word: ")
 		fmt.Scan(&word)
 
 		req := &translator.TranslatingRequest{
