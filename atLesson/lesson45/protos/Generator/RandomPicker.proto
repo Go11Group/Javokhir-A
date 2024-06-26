@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "genproto/generator/";
+
+package protos;
+
+service Generator {
+  rpc RandomPicker(Request) returns (Response) {}
+  rpc GetNameBySurname(UserName) returns (UserSurname) {}
+}
+
+message Request {
+  int32 limit = 1;
+  map<int32, bool> exception = 2;
+  repeated string names = 3;
+}
+
+message Response {
+  map<string, int32> result = 1;
+}
+
+message UserName {
+  string name = 1;
+}
+
+message UserSurname {
+  string surname = 1;
+}

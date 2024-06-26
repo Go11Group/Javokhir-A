@@ -9,14 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserHandlerPlan interface {
-	CreateUser(c *gin.Context)
-	GetUserByID(c *gin.Context)
-	UpdateUser(c *gin.Context)
-	DeleteUser(c *gin.Context)
-	GetAllUsers(c *gin.Context)
-}
-
 type UserHandler struct {
 	UserService *services.UserService
 }
@@ -81,7 +73,6 @@ func (uh UserHandler) UpdateUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
-
 func (uh UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	errCode := http.StatusBadRequest
