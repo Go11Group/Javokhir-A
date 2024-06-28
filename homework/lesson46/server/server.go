@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Go11Group/Javokhir-A/homework/lesson45/pb"
+	"github.com/Go11Group/Javokhir-A/homework/lesson46/pb"
 	"google.golang.org/grpc"
 )
 

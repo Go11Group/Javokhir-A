@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Go11Group/Javokhir-A/homework/lesson45/pb"
+	"github.com/Go11Group/Javokhir-A/homework/lesson46/pb"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

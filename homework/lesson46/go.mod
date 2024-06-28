@@ -1,4 +1,4 @@
-module github.com/Go11Group/Javokhir-A/homework/lesson45
+module github.com/Go11Group/Javokhir-A/homework/lesson46
 
 go 1.22.3
 
