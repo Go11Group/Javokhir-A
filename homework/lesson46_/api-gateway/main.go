@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	gw "github.com/Go11Group/Javokhir-A/homework/lesson46_/api-gateway/genproto" // Import generated protobuf package
+	gw "github.com/Go11Group/Javokhir-A/homework/lesson46_/api-gateway/genproto/grpc" // Import generated protobuf package
 	"google.golang.org/grpc"
 )
 
