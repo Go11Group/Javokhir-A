@@ -1,84 +1,89 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/Go11Group/Javokhir-A/homework/lesson33/models"
 	"github.com/Go11Group/Javokhir-A/homework/lesson33/repositories"
 	"github.com/Go11Group/Javokhir-A/homework/lesson33/storage/postgres"
+	"github.com/gin-gonic/gin"
 )
-
-var (
-	db = postgres.DB
-)
-var userRepo repositories.UserRepository
 
 func main() {
-	dsn := "host=localhost port=5432 user=postgres dbname=testing sslmode=disable password=1702"
-
-	err := postgres.ConnectDB(dsn)
-	if err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
-	}
-	defer postgres.CloseDB()
-
-	db = postgres.DB
-
-	userRepo = repositories.NewUserRepository(db)
-
-	user, err := userRepo.GetUserByID(10)
-	if err != nil {
-		log.Printf("Failed to get user: %v", err)
-		return
-	}
-
-	fmt.Println(user)
-
-	// APIs
-	// ``
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /user/{id}", UserFuncHandler) //first API to fetch user data by its id
-	mux.HandleFunc("DELETE /user/{id}", DeleteUser)
-	err = http.ListenAndServe("localhost:8080", mux)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	userId, err := strconv.Atoi(r.PathValue("id"))
+	db, err := postgres.NewConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	userRepo.(userId)
-}
+	db.AutoMigrate(&models.User{})
 
-func UserFuncHandler(w http.ResponseWriter, r *http.Request) {
+	userRepository := repositories.NewUserRepository(db)
 
-	w.Header().Set("content-type", "application/json")
-	// w.Header().Values()
-	userId, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	r := gin.Default()
 
-	user, err := userRepo.GetUserByID(userId)
-	if err != nil {
-		fmt.Fprintf(w, "User by id %d not found", userId)
-	}
+	r.GET("/users", func(c *gin.Context) {
+		users, err := userRepository.GetAllUsers()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, users)
+	})
 
-	userInfo, err := json.Marshal(user)
-	if err != nil {
-		log.Fatal(err)
-	}
+	r.GET("/users/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		user, err := userRepository.GetUserByID(uint(id))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, user)
+	})
 
-	_, err = w.Write(userInfo)
-	if err != nil {
-		log.Fatal(err)
-	}
+	r.POST("/users", func(c *gin.Context) {
+		var user models.User
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := userRepository.CreateUser(&user); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusCreated, user)
+	})
 
+	r.PUT("/users/:id", func(c *gin.Context) {
+		var user models.User
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := userRepository.UpdateUser(&user); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, user)
+	})
+
+	r.DELETE("/users/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := userRepository.DeleteUser(uint(id)); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusNoContent, nil)
+	})
+
+	r.Run()
 }

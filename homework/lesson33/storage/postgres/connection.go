@@ -1,39 +1,23 @@
 package postgres
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	DB *gorm.DB
-)
-
-func ConnectDB(dsn string) error {
+func NewConnection() (*gorm.DB, error) {
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		log.Fatal("DATABASE_URL is not set")
+	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("failed while connecting %w", err)
+		return nil, err
 	}
 
-	DB = db
-	DB.DB()
-	return nil
-}
-
-func CloseDB() {
-	if DB != nil {
-		dbPostgers, err := DB.DB()
-		if err != nil {
-			fmt.Printf("Error getting uderlying database connection: %v\n", err)
-			return
-		}
-
-		if err := dbPostgers.Close(); err != nil {
-			fmt.Printf("Erorr closing database connection: %v\n", err)
-			return
-		}
-	}
+	return db, nil
 }
